@@ -21,7 +21,7 @@ export const mockPaymentMethods: PaymentMethodData[] = [
     name: "PIX",
     iconName: "QrCode",
     description: "Instantâneo e gratuito",
-    highlight: true,
+    highlight: true, // ← PIX fica com fundo verde na homepage
     badge: "0% taxa",
     rate: 0,
     available: true,
@@ -31,7 +31,7 @@ export const mockPaymentMethods: PaymentMethodData[] = [
     name: "Cartão de Crédito",
     iconName: "CreditCard",
     description: "Até 12x sem juros",
-    highlight: false,
+    highlight: false,// ← Cartão fica com fundo normal
     badge: "A partir de 3,99%",
     rate: 0.0399,
     available: true,
