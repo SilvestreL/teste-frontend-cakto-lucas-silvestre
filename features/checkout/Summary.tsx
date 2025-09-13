@@ -2,9 +2,11 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { UrgencyElements } from "@/components/urgency/UrgencyElements";
 import type { Product, CheckoutInput } from "@/types/checkout";
 import { formatBRL, formatPercent } from "@/lib/currency";
 import { calcRate, calcTotal, calcInstallment, calcNet } from "@/lib/taxes";
+import { useCountdown } from "@/lib/hooks/useCountdown";
 import { Zap, TrendingDown, Shield, Clock, CreditCard } from "lucide-react";
 
 interface SummaryProps {
@@ -13,12 +15,18 @@ interface SummaryProps {
 }
 
 export function Summary({ product, formData }: SummaryProps) {
+  const { isExpired } = useCountdown(10); // 10 minutos de desconto
   const rate = calcRate(formData.paymentMethod, formData.installments);
-  const total = calcTotal(product.currentPrice, rate);
+
+  // Usa preço promocional se o timer não expirou, senão usa preço original
+  const effectivePrice = isExpired
+    ? product.originalPrice
+    : product.currentPrice;
+  const total = calcTotal(effectivePrice, rate);
   const monthlyValue = calcInstallment(total, formData.installments);
-  const netValue = calcNet(product.currentPrice, total);
-  const savings = product.originalPrice - product.currentPrice;
-  const feeAmount = total - product.currentPrice;
+  const netValue = calcNet(effectivePrice, total);
+  const savings = product.originalPrice - effectivePrice;
+  const feeAmount = total - effectivePrice;
   const savingsPercent = ((savings / product.originalPrice) * 100).toFixed(0);
 
   return (
@@ -100,10 +108,10 @@ export function Summary({ product, formData }: SummaryProps) {
 
             <div className="flex items-center justify-between">
               <span className="text-sm text-text-secondary">
-                Preço promocional
+                {isExpired ? "Preço original" : "Preço promocional"}
               </span>
               <span className="text-lg font-bold text-text-primary">
-                {formatBRL(product.currentPrice)}
+                {formatBRL(effectivePrice)}
               </span>
             </div>
 
@@ -121,6 +129,14 @@ export function Summary({ product, formData }: SummaryProps) {
               </div>
             )}
           </div>
+
+          {/* Elementos de urgência */}
+          <UrgencyElements
+            showCountdown={true}
+            showSocialProof={true}
+            countdownMinutes={10}
+            className="mt-4"
+          />
         </div>
 
         <Separator className="bg-border/40" />
