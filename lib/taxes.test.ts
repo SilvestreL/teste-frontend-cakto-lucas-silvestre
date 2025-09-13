@@ -11,16 +11,16 @@ describe("Tax calculations", () => {
       expect(calcRate("card", 1)).toBe(0.0399)
     })
 
-    it("should return 6.99% for card 2x", () => {
-      expect(calcRate("card", 2)).toBe(0.0699)
+    it("should return 5.99% for card 2x", () => {
+      expect(calcRate("card", 2)).toBe(0.0599) // 3.99% + 2% * 1
     })
 
-    it("should return 8.99% for card 3x", () => {
-      expect(calcRate("card", 3)).toBe(0.0899)
+    it("should return 7.99% for card 3x", () => {
+      expect(calcRate("card", 3)).toBe(0.0799) // 3.99% + 2% * 2
     })
 
     it("should return correct rate for card 12x", () => {
-      expect(calcRate("card", 12)).toBe(0.2699) // 4.99% + 2% * 11
+      expect(calcRate("card", 12)).toBe(0.2599) // 3.99% + 2% * 11
     })
   })
 
