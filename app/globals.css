@@ -22,8 +22,8 @@
   --info: #3b82f6;
 
   /* tipografia */
-  --font-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans",
-    "Apple Color Emoji", "Segoe UI Emoji";
+  --font-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
   --radius: 14px; /* 2xl suave */
 
   /* espaçamentos escala 4/8 */
@@ -48,6 +48,14 @@
   /* shadcn/ui's default styles */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0 0);
+
+  /* utilitários de texto */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);

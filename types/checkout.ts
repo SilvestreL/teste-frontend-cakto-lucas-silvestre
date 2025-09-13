@@ -12,7 +12,10 @@ export interface Product {
   name: string
   originalPrice: number
   currentPrice: number
-  description: string
+  producer: string
+  format: string
+  deliveryTime: string
+  description?: string
   image?: string
 }
 

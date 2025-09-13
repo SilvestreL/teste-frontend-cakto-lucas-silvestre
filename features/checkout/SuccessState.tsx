@@ -1,35 +1,47 @@
-"use client"
-import { useState } from "react"
-import { Container } from "@/components/layout/Container"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { CheckCircle, Copy, Download, ArrowRight, QrCode, CreditCard, Clock, Zap } from "lucide-react"
-import { formatBRL } from "@/lib/currency"
-import Link from "next/link"
+"use client";
+import { useState } from "react";
+import { Container } from "@/components/layout/Container";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  CheckCircle,
+  Copy,
+  Download,
+  ArrowRight,
+  QrCode,
+  CreditCard,
+  Clock,
+  Zap,
+} from "lucide-react";
+import { formatBRL } from "@/lib/currency";
+import Link from "next/link";
 
 interface SuccessStateProps {
-  orderId: string
+  orderId: string;
 }
 
 // Mock order data based on the order ID
 function getMockOrderData(orderId: string) {
   // Extract timestamp from order ID to simulate realistic data
-  const timestamp = orderId.split("-")[1]
-  const isRecent = Date.now() - Number.parseInt(timestamp) < 300000 // 5 minutes
+  const timestamp = orderId.split("-")[1];
+  const isRecent = Date.now() - Number.parseInt(timestamp) < 300000; // 5 minutes
 
   // Simulate different payment methods based on order ID
-  const isPix = orderId.includes("PIX") || Math.random() > 0.5
+  const isPix = orderId.includes("PIX") || Math.random() > 0.5;
 
   return {
     id: orderId,
     status: isPix ? "confirmed" : "processing",
     paymentMethod: isPix ? "pix" : "card",
     product: {
-      name: "Curso Completo de Next.js",
+      name: "Curso de Marketing Digital 2025",
       price: isPix ? 297 : 308.83,
       originalPrice: 497,
+      producer: "João Silva",
+      format: "digital",
+      deliveryTime: "imediato",
     },
     customer: {
       email: "cliente@exemplo.com",
@@ -45,23 +57,23 @@ function getMockOrderData(orderId: string) {
     pixCode: isPix
       ? "00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-426614174000520400005303986540529705802BR5925CAKTO PAGAMENTOS LTDA6009SAO PAULO62070503***6304"
       : null,
-  }
+  };
 }
 
 export function SuccessState({ orderId }: SuccessStateProps) {
-  const [orderData] = useState(() => getMockOrderData(orderId))
-  const [copied, setCopied] = useState(false)
+  const [orderData] = useState(() => getMockOrderData(orderId));
+  const [copied, setCopied] = useState(false);
 
   const copyPixCode = async () => {
     if (orderData.pixCode) {
-      await navigator.clipboard.writeText(orderData.pixCode)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(orderData.pixCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-  }
+  };
 
-  const isPix = orderData.paymentMethod === "pix"
-  const isConfirmed = orderData.status === "confirmed"
+  const isPix = orderData.paymentMethod === "pix";
+  const isConfirmed = orderData.status === "confirmed";
 
   return (
     <div className="min-h-screen bg-bg">
@@ -71,7 +83,9 @@ export function SuccessState({ orderId }: SuccessStateProps) {
           <div className="flex items-center justify-center py-4">
             <div className="flex items-center space-x-2">
               <div className="h-6 w-6 rounded bg-brand flex items-center justify-center">
-                <span className="text-brand-foreground font-bold text-sm">C</span>
+                <span className="text-brand-foreground font-bold text-sm">
+                  C
+                </span>
               </div>
               <span className="text-h3 text-text-primary">Cakto</span>
             </div>
@@ -89,7 +103,9 @@ export function SuccessState({ orderId }: SuccessStateProps) {
             </div>
             <div className="space-y-2">
               <h1 className="text-h1 text-text-primary">
-                {isConfirmed ? "Pagamento confirmado!" : "Pedido criado com sucesso!"}
+                {isConfirmed
+                  ? "Pagamento confirmado!"
+                  : "Pedido criado com sucesso!"}
               </h1>
               <p className="text-text-secondary">
                 {isConfirmed
@@ -103,7 +119,9 @@ export function SuccessState({ orderId }: SuccessStateProps) {
           <Card className="p-6 bg-surface border-border space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-h3 text-text-primary">Detalhes do pedido</h2>
+                <h2 className="text-h3 text-text-primary">
+                  Detalhes do pedido
+                </h2>
                 <Badge
                   variant={isConfirmed ? "default" : "secondary"}
                   className={isConfirmed ? "bg-success text-white" : ""}
@@ -115,7 +133,9 @@ export function SuccessState({ orderId }: SuccessStateProps) {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-text-secondary">ID do pedido</span>
-                  <span className="text-text-primary font-mono text-sm">{orderData.id}</span>
+                  <span className="text-text-primary font-mono text-sm">
+                    {orderData.id}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-text-secondary">Data</span>
@@ -131,11 +151,15 @@ export function SuccessState({ orderId }: SuccessStateProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-text-secondary">Email</span>
-                  <span className="text-text-primary">{orderData.customer.email}</span>
+                  <span className="text-text-primary">
+                    {orderData.customer.email}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-text-secondary">CPF</span>
-                  <span className="text-text-primary">{orderData.customer.cpf}</span>
+                  <span className="text-text-primary">
+                    {orderData.customer.cpf}
+                  </span>
                 </div>
               </div>
             </div>
@@ -145,9 +169,26 @@ export function SuccessState({ orderId }: SuccessStateProps) {
             {/* Product Info */}
             <div className="space-y-4">
               <h3 className="font-semibold text-text-primary">Produto</h3>
-              <div className="flex items-center justify-between">
-                <span className="text-text-primary">{orderData.product.name}</span>
-                <span className="text-text-primary font-semibold">{formatBRL(orderData.product.price)}</span>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-text-primary font-medium">
+                    {orderData.product.name}
+                  </span>
+                  <span className="text-text-primary font-semibold">
+                    {formatBRL(orderData.product.price)}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-surface-2 text-text-secondary px-2.5 py-1 rounded-md">
+                    por {orderData.product.producer}
+                  </span>
+                  <span className="text-xs bg-surface-2 text-text-secondary px-2.5 py-1 rounded-md">
+                    Produto digital
+                  </span>
+                  <span className="text-xs bg-brand/10 text-brand px-2.5 py-1 rounded-md">
+                    Liberação imediata
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -161,8 +202,14 @@ export function SuccessState({ orderId }: SuccessStateProps) {
                 ) : (
                   <CreditCard className="h-5 w-5 text-text-secondary" />
                 )}
-                <h3 className="font-semibold text-text-primary">{isPix ? "Pagamento PIX" : "Pagamento no Cartão"}</h3>
-                {isPix && <Badge className="bg-brand text-brand-foreground">0% taxa</Badge>}
+                <h3 className="font-semibold text-text-primary">
+                  {isPix ? "Pagamento PIX" : "Pagamento no Cartão"}
+                </h3>
+                {isPix && (
+                  <Badge className="bg-brand text-brand-foreground">
+                    0% taxa
+                  </Badge>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -170,13 +217,16 @@ export function SuccessState({ orderId }: SuccessStateProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-text-secondary">Parcelamento</span>
                     <span className="text-text-primary">
-                      {orderData.payment.installments}x de {formatBRL(orderData.payment.monthlyValue)}
+                      {orderData.payment.installments}x de{" "}
+                      {formatBRL(orderData.payment.monthlyValue)}
                     </span>
                   </div>
                 )}
                 <div className="flex items-center justify-between">
                   <span className="text-text-secondary">Total pago</span>
-                  <span className="text-text-primary font-bold text-lg">{formatBRL(orderData.payment.total)}</span>
+                  <span className="text-text-primary font-bold text-lg">
+                    {formatBRL(orderData.payment.total)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -186,10 +236,14 @@ export function SuccessState({ orderId }: SuccessStateProps) {
               <>
                 <Separator className="bg-border" />
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-text-primary">Código PIX</h3>
+                  <h3 className="font-semibold text-text-primary">
+                    Código PIX
+                  </h3>
                   <div className="p-4 bg-surface-2 rounded-lg border border-border">
                     <div className="flex items-center justify-between">
-                      <code className="text-sm text-text-primary font-mono break-all">{orderData.pixCode}</code>
+                      <code className="text-sm text-text-primary font-mono break-all">
+                        {orderData.pixCode}
+                      </code>
                       <Button
                         variant="outline"
                         size="sm"
@@ -212,8 +266,12 @@ export function SuccessState({ orderId }: SuccessStateProps) {
               <div className="flex items-center space-x-3">
                 <Zap className="h-6 w-6 text-brand" />
                 <div>
-                  <h3 className="font-semibold text-brand">Pagamento instantâneo confirmado!</h3>
-                  <p className="text-brand/80">Você já tem acesso completo ao produto.</p>
+                  <h3 className="font-semibold text-brand">
+                    Pagamento instantâneo confirmado!
+                  </h3>
+                  <p className="text-brand/80">
+                    Você já tem acesso completo ao produto.
+                  </p>
                 </div>
               </div>
             </Card>
@@ -222,9 +280,12 @@ export function SuccessState({ orderId }: SuccessStateProps) {
               <div className="flex items-center space-x-3">
                 <Clock className="h-6 w-6 text-warning" />
                 <div>
-                  <h3 className="font-semibold text-text-primary">Processando pagamento</h3>
+                  <h3 className="font-semibold text-text-primary">
+                    Processando pagamento
+                  </h3>
                   <p className="text-text-secondary">
-                    Seu pagamento está sendo processado. Você receberá um email de confirmação em breve.
+                    Seu pagamento está sendo processado. Você receberá um email
+                    de confirmação em breve.
                   </p>
                 </div>
               </div>
@@ -252,13 +313,18 @@ export function SuccessState({ orderId }: SuccessStateProps) {
 
           {/* Support */}
           <div className="text-center space-y-2">
-            <p className="text-text-secondary text-sm">Precisa de ajuda? Entre em contato com nosso suporte.</p>
-            <Button variant="link" className="text-brand hover:text-brand-hover p-0">
+            <p className="text-text-secondary text-sm">
+              Precisa de ajuda? Entre em contato com nosso suporte.
+            </p>
+            <Button
+              variant="link"
+              className="text-brand hover:text-brand-hover p-0"
+            >
               suporte@cakto.com
             </Button>
           </div>
         </div>
       </Container>
     </div>
-  )
+  );
 }

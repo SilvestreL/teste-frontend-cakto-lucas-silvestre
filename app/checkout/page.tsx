@@ -7,8 +7,6 @@ import { Summary } from "@/features/checkout/Summary";
 import { MobileSummary } from "@/features/checkout/MobileSummary";
 import type { CheckoutInput } from "@/types/checkout";
 import { defaultProduct, generateMockOrderId } from "@/mocks";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -42,21 +40,17 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-bg">
+      {/* Header simples focado no checkout */}
       <div className="border-b border-border bg-bg/95 backdrop-blur sticky top-0 z-50">
         <Container>
-          <div className="flex items-center justify-between py-4">
-            <Link
-              href="/"
-              className="flex items-center space-x-2 text-text-secondary hover:text-text-primary transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              <span className="font-medium">Voltar</span>
-            </Link>
+          <div className="flex items-center justify-center py-4">
             <div className="flex items-center space-x-3">
               <div className="h-8 w-8 rounded-lg bg-brand flex items-center justify-center">
                 <span className="text-brand-foreground font-bold">C</span>
               </div>
-              <span className="text-xl font-bold text-text-primary">Cakto</span>
+              <span className="text-xl font-bold text-text-primary">
+                Demonstração de Checkout
+              </span>
             </div>
           </div>
         </Container>
@@ -96,31 +90,12 @@ export default function CheckoutPage() {
         </div>
       </Container>
 
+      {/* Footer minimalista */}
       <footer className="border-t border-border bg-surface/50 mt-12">
         <Container>
           <div className="py-6 text-center">
-            <div className="flex items-center justify-center space-x-6 text-sm text-text-secondary">
-              <Link
-                href="/terms"
-                className="hover:text-text-primary transition-colors"
-              >
-                Termos de Uso
-              </Link>
-              <Link
-                href="/privacy"
-                className="hover:text-text-primary transition-colors"
-              >
-                Política de Privacidade
-              </Link>
-              <Link
-                href="/support"
-                className="hover:text-text-primary transition-colors"
-              >
-                Suporte
-              </Link>
-            </div>
-            <p className="text-xs text-text-secondary mt-2">
-              © 2024 Cakto. Todos os direitos reservados.
+            <p className="text-sm text-text-secondary">
+              © 2025 Demonstração de Checkout
             </p>
           </div>
         </Container>

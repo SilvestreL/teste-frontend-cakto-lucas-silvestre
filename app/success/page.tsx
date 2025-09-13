@@ -1,12 +1,12 @@
-"use client"
-import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import { Container } from "@/components/layout/Container"
-import { SuccessState } from "@/features/checkout/SuccessState"
+"use client";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { Container } from "@/components/layout/Container";
+import { SuccessState } from "@/features/checkout/SuccessState";
 
 function SuccessContent() {
-  const searchParams = useSearchParams()
-  const orderId = searchParams.get("id")
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("id");
 
   if (!orderId) {
     return (
@@ -14,14 +14,16 @@ function SuccessContent() {
         <Container>
           <div className="text-center space-y-4">
             <h1 className="text-h1 text-text-primary">Pedido não encontrado</h1>
-            <p className="text-text-secondary">ID do pedido não foi fornecido.</p>
+            <p className="text-text-secondary">
+              ID do pedido não foi fornecido ou é inválido.
+            </p>
           </div>
         </Container>
       </div>
-    )
+    );
   }
 
-  return <SuccessState orderId={orderId} />
+  return <SuccessState orderId={orderId} />;
 }
 
 export default function SuccessPage() {
@@ -35,5 +37,5 @@ export default function SuccessPage() {
     >
       <SuccessContent />
     </Suspense>
-  )
+  );
 }
