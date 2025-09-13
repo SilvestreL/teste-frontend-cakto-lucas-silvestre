@@ -3,6 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { UrgencyElements } from "@/components/urgency/UrgencyElements";
+import { MobileProductHeader } from "@/components/mobile/MobileProductHeader";
+import { MobileUrgencyElements } from "@/components/mobile/MobileUrgencyElements";
+import { MobileSummaryCompact } from "@/components/mobile/MobileSummaryCompact";
+import { MobileDetailsAccordion } from "@/components/mobile/MobileDetailsAccordion";
 import type { Product, CheckoutInput } from "@/types/checkout";
 import { formatBRL, formatPercent } from "@/lib/currency";
 import { calcRate, calcTotal, calcInstallment, calcNet } from "@/lib/taxes";
@@ -30,10 +34,19 @@ export function Summary({ product, formData }: SummaryProps) {
   const savingsPercent = ((savings / product.originalPrice) * 100).toFixed(0);
 
   return (
-    <Card className="p-6 bg-surface border-border">
-      <div className="space-y-6">
-        {/* Product Section */}
-        <div className="space-y-4">
+    <Card className="p-4 sm:p-6 bg-surface border-border">
+      <div className="space-y-4 sm:space-y-6">
+        {/* Mobile: Cabeçalho compacto */}
+        <div className="block sm:hidden">
+          <MobileProductHeader
+            product={product}
+            currentPrice={effectivePrice}
+            paymentMethod={formData.paymentMethod}
+          />
+        </div>
+
+        {/* Desktop: Product Section */}
+        <div className="hidden sm:block space-y-4">
           <div className="aspect-video rounded-xl bg-surface-2 overflow-hidden border border-border">
             <img
               src={product.image || "/placeholder.svg"}
@@ -82,8 +95,24 @@ export function Summary({ product, formData }: SummaryProps) {
 
         <Separator className="bg-border/40" />
 
-        {/* Pricing Section */}
-        <div className="space-y-4">
+        {/* Mobile: Resumo compacto + urgência */}
+        <div className="block sm:hidden space-y-3">
+          <MobileSummaryCompact
+            originalPrice={product.originalPrice}
+            currentPrice={effectivePrice}
+            savings={savings}
+            savingsPercent={Number(savingsPercent)}
+          />
+
+          <MobileUrgencyElements
+            showCountdown={true}
+            showSocialProof={true}
+            countdownMinutes={10}
+          />
+        </div>
+
+        {/* Desktop: Pricing Section */}
+        <div className="hidden sm:block space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-lg font-bold text-text-primary">
               Resumo do pedido
@@ -141,8 +170,69 @@ export function Summary({ product, formData }: SummaryProps) {
 
         <Separator className="bg-border/40" />
 
-        {/* Payment Details Section */}
-        <div className="space-y-4">
+        {/* Mobile: Detalhes em accordion */}
+        <div className="block sm:hidden">
+          <MobileDetailsAccordion title="Detalhes do pagamento">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-text-secondary">
+                  Método escolhido
+                </span>
+                <div className="flex items-center space-x-2">
+                  {formData.paymentMethod === "pix" ? (
+                    <Badge className="bg-brand text-brand-foreground text-xs px-2 py-0.5 h-auto">
+                      <Zap className="h-3 w-3 mr-1" />
+                      PIX • 0% taxa
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="secondary"
+                      className="bg-surface-2 text-text-primary border-border text-xs px-2 py-0.5 h-auto"
+                    >
+                      <CreditCard className="h-3 w-3 mr-1" />
+                      Cartão • {formatPercent(rate)}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {formData.paymentMethod === "card" &&
+                formData.installments > 1 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-text-secondary">
+                      Parcelamento
+                    </span>
+                    <span className="text-xs font-medium text-text-primary">
+                      {formData.installments}x de {formatBRL(monthlyValue)}
+                    </span>
+                  </div>
+                )}
+
+              {feeAmount > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-text-secondary">
+                    Taxa do cartão
+                  </span>
+                  <span className="text-xs text-text-primary">
+                    + {formatBRL(feeAmount)}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-secondary">
+                  Produtor recebe (líquido)
+                </span>
+                <span className="font-semibold text-text-primary">
+                  {formatBRL(netValue)}
+                </span>
+              </div>
+            </div>
+          </MobileDetailsAccordion>
+        </div>
+
+        {/* Desktop: Payment Details Section */}
+        <div className="hidden sm:block space-y-4">
           <h5 className="font-semibold text-text-primary">
             Detalhes do pagamento
           </h5>
@@ -205,8 +295,20 @@ export function Summary({ product, formData }: SummaryProps) {
 
         <Separator className="bg-border/40" />
 
-        {/* Total Section */}
-        <div className="space-y-4">
+        {/* Mobile: Total compacto */}
+        <div className="block sm:hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-bold text-text-primary">
+              Total a pagar
+            </span>
+            <span className="text-lg font-bold text-text-primary">
+              {formatBRL(total)}
+            </span>
+          </div>
+        </div>
+
+        {/* Desktop: Total Section */}
+        <div className="hidden sm:block space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-text-primary">
               Total a pagar
