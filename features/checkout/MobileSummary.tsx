@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/collapsible";
 import type { Product, CheckoutInput } from "@/types/checkout";
 import { formatBRL, formatPercent } from "@/lib/currency";
-import { calcRate, calcTotal, calcNet } from "@/lib/taxes";
+import { getPricing, getFormattedPricing } from "@/lib/pricing";
+import Decimal from "decimal.js";
 import {
   ChevronDown,
   ChevronUp,
@@ -26,11 +27,28 @@ interface MobileSummaryProps {
 
 export function MobileSummary({ product, formData }: MobileSummaryProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const rate = calcRate(formData.paymentMethod, formData.installments);
-  const total = calcTotal(product.currentPrice, rate);
-  const savings = product.originalPrice - product.currentPrice;
-  const netValue = calcNet(product.currentPrice, total);
-  const feeAmount = total - product.currentPrice;
+
+  // Usa o novo sistema de preços para cálculos precisos
+  const pricing = getPricing({
+    originalValue: new Decimal(product.originalPrice),
+    currentValue: new Decimal(product.currentPrice),
+    paymentMethod: formData.paymentMethod,
+    installments: formData.installments,
+  });
+
+  const formattedPricing = getFormattedPricing({
+    originalValue: new Decimal(product.originalPrice),
+    currentValue: new Decimal(product.currentPrice),
+    paymentMethod: formData.paymentMethod,
+    installments: formData.installments,
+  });
+
+  // Valores para compatibilidade com o código existente
+  const total = pricing.total.toNumber();
+  const savings = pricing.savings.toNumber();
+  const netValue = pricing.netValue.toNumber();
+  const feeAmount = pricing.feeAmount.toNumber();
+  const rate = pricing.rate.toNumber();
 
   return (
     <div className="border-b border-border bg-surface/50 backdrop-blur sticky top-0 z-40">

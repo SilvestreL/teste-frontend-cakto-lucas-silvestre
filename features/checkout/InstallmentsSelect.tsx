@@ -6,8 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { generateInstallmentOptions } from "@/lib/taxes";
-import { formatBRLFixed, formatPercentFixed } from "@/lib/currency";
+import { getPricing } from "@/lib/pricing";
+import Decimal from "decimal.js";
 
 interface InstallmentsSelectProps {
   value: number;
@@ -20,7 +20,16 @@ export function InstallmentsSelect({
   onChange,
   productValue,
 }: InstallmentsSelectProps) {
-  const options = generateInstallmentOptions(productValue);
+  // Usa o novo sistema de preços para obter opções precisas
+  const pricing = getPricing({
+    originalValue: new Decimal(productValue),
+    currentValue: new Decimal(productValue),
+    paymentMethod: "card",
+    installments: 1,
+    includeInstallmentOptions: true,
+  });
+
+  const options = pricing.installmentOptions;
 
   return (
     <Select
@@ -42,20 +51,19 @@ export function InstallmentsSelect({
                 <span className="font-medium">{option.label}</span>
                 {option.value > 1 && (
                   <span className="text-text-primary font-semibold">
-                    {formatBRLFixed(option.monthlyValue, 2)}
+                    {option.monthlyValue.toFixed(2).replace(".", ",")}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-3">
                 {option.value > 1 && (
                   <span className="text-text-secondary text-sm">
-                    ({formatPercentFixed(option.rate, 2)})
+                    ({option.rate.mul(100).toFixed(2).replace(".", ",")}%)
                   </span>
                 )}
                 {option.value > 1 && (
                   <span className="text-text-secondary text-sm font-medium">
-                    Total:{" "}
-                    {formatBRLFixed(option.monthlyValue * option.value, 2)}
+                    Total: {option.adjustedTotal.toFixed(2).replace(".", ",")}
                   </span>
                 )}
               </div>

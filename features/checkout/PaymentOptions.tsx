@@ -1,21 +1,37 @@
-"use client"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { QrCode, CreditCard, Zap, Clock } from "lucide-react"
-import { formatBRL } from "@/lib/currency"
-import { calcRate, calcTotal } from "@/lib/taxes"
+"use client";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { QrCode, CreditCard, Zap, Clock } from "lucide-react";
+import { getFormattedPricing } from "@/lib/pricing";
+import Decimal from "decimal.js";
 
 interface PaymentOptionsProps {
-  selected: "pix" | "card"
-  onSelect: (method: "pix" | "card") => void
-  productValue: number
+  selected: "pix" | "card";
+  onSelect: (method: "pix" | "card") => void;
+  productValue: number;
+  installments?: number;
 }
 
-export function PaymentOptions({ selected, onSelect, productValue }: PaymentOptionsProps) {
-  const pixRate = calcRate("pix")
-  const cardRate = calcRate("card", 1)
-  const pixTotal = calcTotal(productValue, pixRate)
-  const cardTotal = calcTotal(productValue, cardRate)
+export function PaymentOptions({
+  selected,
+  onSelect,
+  productValue,
+  installments = 1,
+}: PaymentOptionsProps) {
+  // Usa o novo sistema de preços para cálculos precisos
+  const pixPricing = getFormattedPricing({
+    originalValue: new Decimal(productValue),
+    currentValue: new Decimal(productValue),
+    paymentMethod: "pix",
+    installments: 1,
+  });
+
+  const cardPricing = getFormattedPricing({
+    originalValue: new Decimal(productValue),
+    currentValue: new Decimal(productValue),
+    paymentMethod: "card",
+    installments,
+  });
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,16 +65,24 @@ export function PaymentOptions({ selected, onSelect, productValue }: PaymentOpti
                 <h3 className="font-bold text-lg text-text-primary">PIX</h3>
                 <div className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-brand" />
-                  <p className="text-sm text-brand font-medium">Receba acesso imediato</p>
+                  <p className="text-sm text-brand font-medium">
+                    Receba acesso imediato
+                  </p>
                 </div>
               </div>
             </div>
-            <Badge className="bg-brand text-brand-foreground font-semibold px-3 py-1">0% taxa</Badge>
+            <Badge className="bg-brand text-brand-foreground font-semibold px-3 py-1">
+              0% taxa
+            </Badge>
           </div>
 
           <div className="space-y-2">
-            <p className="text-2xl font-bold text-text-primary">{formatBRL(pixTotal)}</p>
-            <p className="text-sm text-text-secondary">Pagamento à vista • Aprovação instantânea</p>
+            <p className="text-2xl font-bold text-text-primary">
+              {pixPricing.total}
+            </p>
+            <p className="text-sm text-text-secondary">
+              Pagamento à vista • Aprovação instantânea
+            </p>
           </div>
         </div>
       </Card>
@@ -90,10 +114,14 @@ export function PaymentOptions({ selected, onSelect, productValue }: PaymentOpti
                 <CreditCard className="h-6 w-6 text-text-secondary" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-text-primary">Cartão de Crédito</h3>
+                <h3 className="font-bold text-lg text-text-primary">
+                  Cartão de Crédito
+                </h3>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-text-secondary" />
-                  <p className="text-sm text-text-secondary">Até 12x sem juros</p>
+                  <p className="text-sm text-text-secondary">
+                    Até 12x sem juros
+                  </p>
                 </div>
               </div>
             </div>
@@ -103,11 +131,15 @@ export function PaymentOptions({ selected, onSelect, productValue }: PaymentOpti
           </div>
 
           <div className="space-y-2">
-            <p className="text-2xl font-bold text-text-primary">{formatBRL(cardTotal)}</p>
-            <p className="text-sm text-text-secondary">1x no cartão • Aprovação em minutos</p>
+            <p className="text-2xl font-bold text-text-primary">
+              {cardPricing.total}
+            </p>
+            <p className="text-sm text-text-secondary">
+              {installments}x no cartão • Aprovação em minutos
+            </p>
           </div>
         </div>
       </Card>
     </div>
-  )
+  );
 }

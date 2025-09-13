@@ -9,7 +9,8 @@ import { MobileSummaryCompact } from "@/components/mobile/MobileSummaryCompact";
 import { MobileDetailsAccordion } from "@/components/mobile/MobileDetailsAccordion";
 import type { Product, CheckoutInput } from "@/types/checkout";
 import { formatBRL, formatPercent } from "@/lib/currency";
-import { calcRate, calcTotal, calcInstallment, calcNet } from "@/lib/taxes";
+import { getPricing, getFormattedPricing } from "@/lib/pricing";
+import Decimal from "decimal.js";
 import { useCountdown } from "@/lib/hooks/useCountdown";
 import { Zap, TrendingDown, Shield, Clock, CreditCard } from "lucide-react";
 
@@ -20,18 +21,34 @@ interface SummaryProps {
 
 export function Summary({ product, formData }: SummaryProps) {
   const { isExpired } = useCountdown(10); // 10 minutos de desconto
-  const rate = calcRate(formData.paymentMethod, formData.installments);
 
   // Usa preço promocional se o timer não expirou, senão usa preço original
   const effectivePrice = isExpired
     ? product.originalPrice
     : product.currentPrice;
-  const total = calcTotal(effectivePrice, rate);
-  const monthlyValue = calcInstallment(total, formData.installments);
-  const netValue = calcNet(effectivePrice, total);
-  const savings = product.originalPrice - effectivePrice;
-  const feeAmount = total - effectivePrice;
-  const savingsPercent = ((savings / product.originalPrice) * 100).toFixed(0);
+
+  // Usa o novo sistema de preços para cálculos precisos
+  const pricing = getPricing({
+    originalValue: new Decimal(product.originalPrice),
+    currentValue: new Decimal(effectivePrice),
+    paymentMethod: formData.paymentMethod,
+    installments: formData.installments,
+  });
+
+  const formattedPricing = getFormattedPricing({
+    originalValue: new Decimal(product.originalPrice),
+    currentValue: new Decimal(effectivePrice),
+    paymentMethod: formData.paymentMethod,
+    installments: formData.installments,
+  });
+
+  // Valores para compatibilidade com o código existente
+  const total = pricing.total.toNumber();
+  const monthlyValue = pricing.monthlyValue.toNumber();
+  const netValue = pricing.netValue.toNumber();
+  const savings = pricing.savings.toNumber();
+  const feeAmount = pricing.feeAmount.toNumber();
+  const savingsPercent = pricing.savingsPercentage.toFixed(0);
 
   return (
     <Card className="p-4 sm:p-6 bg-surface border-border">
@@ -190,7 +207,7 @@ export function Summary({ product, formData }: SummaryProps) {
                       className="bg-surface-2 text-text-primary border-border text-xs px-2 py-0.5 h-auto"
                     >
                       <CreditCard className="h-3 w-3 mr-1" />
-                      Cartão • {formatPercent(rate)}
+                      Cartão • {formattedPricing.rate}
                     </Badge>
                   )}
                 </div>
@@ -254,7 +271,7 @@ export function Summary({ product, formData }: SummaryProps) {
                     className="bg-surface-2 text-text-primary border-border"
                   >
                     <CreditCard className="h-3 w-3 mr-1" />
-                    Cartão • {formatPercent(rate)}
+                    Cartão • {formattedPricing.rate}
                   </Badge>
                 )}
               </div>
