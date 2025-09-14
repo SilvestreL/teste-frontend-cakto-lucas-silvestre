@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { formatBRL } from "@/lib/currency";
 import { maskCPF } from "@/lib/cpf";
+import { getPricing } from "@/lib/pricing";
+import Decimal from "decimal.js";
 import Link from "next/link";
 
 interface SuccessStateProps {
@@ -39,19 +41,23 @@ function getMockOrderData(
   const isRecent = Date.now() - Number.parseInt(timestamp) < 300000; // 5 minutes
 
   // Use form data if available, otherwise simulate
-  const isPix =
-    formData?.paymentMethod === "pix" ||
-    orderId.includes("PIX") ||
-    Math.random() > 0.5;
-  const installments =
-    formData?.installments || (isPix ? 1 : Math.floor(Math.random() * 12) + 1);
+  const isPix = formData?.paymentMethod === "pix";
+  const installments = formData?.installments || 1;
 
-  // Calculate pricing based on form data
+  // Calculate pricing based on form data - use the same pricing logic as the checkout
   const basePrice = 297; // Promotional price
   const originalPrice = 497;
-  const cardRate = 0.0399; // 3.99% for card
-  const cardPrice = isPix ? basePrice : basePrice * (1 + cardRate);
-  const monthlyValue = isPix ? basePrice : cardPrice / installments;
+  
+  // Use the same pricing system as the checkout
+  const pricing = getPricing({
+    originalValue: new Decimal(originalPrice),
+    currentValue: new Decimal(basePrice),
+    paymentMethod: formData?.paymentMethod || (isPix ? "pix" : "card"),
+    installments: installments,
+  });
+  
+  const totalPrice = pricing.total.toNumber();
+  const monthlyValue = pricing.monthlyValue.toNumber();
 
   return {
     id: orderId,
@@ -59,7 +65,7 @@ function getMockOrderData(
     paymentMethod: formData?.paymentMethod || (isPix ? "pix" : "card"),
     product: {
       name: "Curso de Marketing Digital 2025",
-      price: cardPrice,
+      price: totalPrice,
       originalPrice: originalPrice,
       producer: "João Silva",
       format: "digital",
@@ -72,8 +78,8 @@ function getMockOrderData(
     payment: {
       installments: installments,
       monthlyValue: monthlyValue,
-      rate: isPix ? 0 : cardRate,
-      total: cardPrice,
+      rate: isPix ? 0 : pricing.feePercentage.toNumber(),
+      total: totalPrice,
     },
     createdAt: new Date(Number.parseInt(timestamp)),
     pixCode: isPix
