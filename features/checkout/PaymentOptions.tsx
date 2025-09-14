@@ -66,7 +66,7 @@ export function PaymentOptions({
                 <div className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-brand" />
                   <p className="text-sm text-brand font-medium">
-                    Receba acesso imediato
+                    Acesso imediato
                   </p>
                 </div>
               </div>

@@ -78,9 +78,6 @@ export default function CheckoutPage() {
               <h1 className="text-2xl lg:text-3xl font-bold text-text-primary">
                 Finalizar compra
               </h1>
-              <p className="text-text-secondary leading-relaxed">
-                Preencha seus dados para concluir a compra do curso
-              </p>
             </div>
 
             <CheckoutForm
