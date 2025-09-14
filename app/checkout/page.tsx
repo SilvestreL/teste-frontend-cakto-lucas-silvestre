@@ -11,8 +11,8 @@ import { defaultProduct, generateMockOrderId } from "@/mocks";
 export default function CheckoutPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<CheckoutInput>({
-    email: "",
-    cpf: "",
+    email: "lucas.silvestre@gmail.com",
+    cpf: "07822816489",
     paymentMethod: "pix",
     installments: 1,
   });
@@ -32,8 +32,18 @@ export default function CheckoutPage() {
       // Generate mock order ID
       const orderId = generateMockOrderId();
 
-      // Redirect to success page
-      router.push(`/success?id=${orderId}`);
+      // Encode form data to pass to success page
+      const encodedData = encodeURIComponent(
+        JSON.stringify({
+          email: data.email,
+          cpf: data.cpf,
+          paymentMethod: data.paymentMethod,
+          installments: data.installments,
+        })
+      );
+
+      // Redirect to success page with order ID and form data
+      router.push(`/success?id=${orderId}&data=${encodedData}`);
     },
     [router]
   );

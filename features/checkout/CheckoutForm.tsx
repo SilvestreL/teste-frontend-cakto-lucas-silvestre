@@ -17,8 +17,15 @@ import { useCountdown } from "@/lib/hooks/useCountdown";
 import { Shield, Zap, Loader2 } from "lucide-react";
 
 const checkoutSchema = z.object({
-  email: z.string().email("Email inválido"),
-  cpf: z.string().refine(isValidCPF, "CPF inválido"),
+  email: z.string().min(1, "Email é obrigatório").email("Email inválido"),
+  cpf: z
+    .string()
+    .min(11, "CPF deve ter 11 dígitos")
+    .refine((cpf) => {
+      if (!cpf) return false;
+      const numbersOnly = cpf.replace(/\D/g, "");
+      return numbersOnly.length === 11 && isValidCPF(numbersOnly);
+    }, "CPF inválido"),
   paymentMethod: z.enum(["pix", "card"]),
   installments: z.number().min(1).max(12),
 });
@@ -38,7 +45,7 @@ export function CheckoutForm({
   onSubmit,
   isSubmitting,
 }: CheckoutFormProps) {
-  const [cpfValue, setCpfValue] = useState("");
+  const [cpfValue, setCpfValue] = useState(maskCPF(data.cpf || ""));
   const isInitialRender = useRef(true);
   const { isExpired } = useCountdown(10); // 10 minutos de desconto
 

@@ -16,42 +16,64 @@ import {
   Zap,
 } from "lucide-react";
 import { formatBRL } from "@/lib/currency";
+import { maskCPF } from "@/lib/cpf";
 import Link from "next/link";
 
 interface SuccessStateProps {
   orderId: string;
+  formData?: {
+    email: string;
+    cpf: string;
+    paymentMethod: "pix" | "card";
+    installments: number;
+  } | null;
 }
 
-// Mock order data based on the order ID
-function getMockOrderData(orderId: string) {
+// Mock order data based on the order ID and form data
+function getMockOrderData(
+  orderId: string,
+  formData?: SuccessStateProps["formData"]
+) {
   // Extract timestamp from order ID to simulate realistic data
   const timestamp = orderId.split("-")[1];
   const isRecent = Date.now() - Number.parseInt(timestamp) < 300000; // 5 minutes
 
-  // Simulate different payment methods based on order ID
-  const isPix = orderId.includes("PIX") || Math.random() > 0.5;
+  // Use form data if available, otherwise simulate
+  const isPix =
+    formData?.paymentMethod === "pix" ||
+    orderId.includes("PIX") ||
+    Math.random() > 0.5;
+  const installments =
+    formData?.installments || (isPix ? 1 : Math.floor(Math.random() * 12) + 1);
+
+  // Calculate pricing based on form data
+  const basePrice = 297; // Promotional price
+  const originalPrice = 497;
+  const cardRate = 0.0399; // 3.99% for card
+  const cardPrice = isPix ? basePrice : basePrice * (1 + cardRate);
+  const monthlyValue = isPix ? basePrice : cardPrice / installments;
 
   return {
     id: orderId,
     status: isPix ? "confirmed" : "processing",
-    paymentMethod: isPix ? "pix" : "card",
+    paymentMethod: formData?.paymentMethod || (isPix ? "pix" : "card"),
     product: {
       name: "Curso de Marketing Digital 2025",
-      price: isPix ? 297 : 308.83,
-      originalPrice: 497,
+      price: cardPrice,
+      originalPrice: originalPrice,
       producer: "João Silva",
       format: "digital",
       deliveryTime: "imediato",
     },
     customer: {
-      email: "cliente@exemplo.com",
-      cpf: "***.***.***-**",
+      email: formData?.email || "cliente@exemplo.com",
+      cpf: formData?.cpf ? maskCPF(formData.cpf) : "***.***.***-**",
     },
     payment: {
-      installments: isPix ? 1 : Math.floor(Math.random() * 12) + 1,
-      monthlyValue: isPix ? 297 : 25.74,
-      rate: isPix ? 0 : 0.0399,
-      total: isPix ? 297 : 308.83,
+      installments: installments,
+      monthlyValue: monthlyValue,
+      rate: isPix ? 0 : cardRate,
+      total: cardPrice,
     },
     createdAt: new Date(Number.parseInt(timestamp)),
     pixCode: isPix
@@ -60,8 +82,8 @@ function getMockOrderData(orderId: string) {
   };
 }
 
-export function SuccessState({ orderId }: SuccessStateProps) {
-  const [orderData] = useState(() => getMockOrderData(orderId));
+export function SuccessState({ orderId, formData }: SuccessStateProps) {
+  const [orderData] = useState(() => getMockOrderData(orderId, formData));
   const [copied, setCopied] = useState(false);
 
   const copyPixCode = async () => {

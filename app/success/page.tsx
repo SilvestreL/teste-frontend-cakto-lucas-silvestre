@@ -7,6 +7,7 @@ import { SuccessState } from "@/features/checkout/SuccessState";
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("id");
+  const encodedData = searchParams.get("data");
 
   if (!orderId) {
     return (
@@ -23,7 +24,17 @@ function SuccessContent() {
     );
   }
 
-  return <SuccessState orderId={orderId} />;
+  // Parse form data if available
+  let formData = null;
+  if (encodedData) {
+    try {
+      formData = JSON.parse(decodeURIComponent(encodedData));
+    } catch (error) {
+      console.error("Erro ao decodificar dados do formulário:", error);
+    }
+  }
+
+  return <SuccessState orderId={orderId} formData={formData} />;
 }
 
 export default function SuccessPage() {
