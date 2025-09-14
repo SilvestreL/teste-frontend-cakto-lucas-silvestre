@@ -47,7 +47,7 @@ function getMockOrderData(
   // Calculate pricing based on form data - use the same pricing logic as the checkout
   const basePrice = 297; // Promotional price
   const originalPrice = 497;
-  
+
   // Use the same pricing system as the checkout
   const pricing = getPricing({
     originalValue: new Decimal(originalPrice),
@@ -55,7 +55,7 @@ function getMockOrderData(
     paymentMethod: formData?.paymentMethod || (isPix ? "pix" : "card"),
     installments: installments,
   });
-  
+
   const totalPrice = pricing.total.toNumber();
   const monthlyValue = pricing.monthlyValue.toNumber();
 
@@ -78,7 +78,7 @@ function getMockOrderData(
     payment: {
       installments: installments,
       monthlyValue: monthlyValue,
-      rate: isPix ? 0 : pricing.feePercentage.toNumber(),
+      rate: isPix ? 0 : pricing.rate.toNumber(),
       total: totalPrice,
     },
     createdAt: new Date(Number.parseInt(timestamp)),
