@@ -7,11 +7,13 @@ import { useCountdown } from "@/lib/hooks/useCountdown";
 interface CountdownTimerProps {
   initialMinutes?: number;
   className?: string;
+  inline?: boolean;
 }
 
 export function CountdownTimer({
   initialMinutes = 10,
   className = "",
+  inline = false,
 }: CountdownTimerProps) {
   const { minutes, seconds, isExpired } = useCountdown(initialMinutes);
 
@@ -46,6 +48,9 @@ export function CountdownTimer({
   const IconComponent = getIcon();
 
   if (isExpired) {
+    if (inline) {
+      return <span className="text-text-secondary">Tempo esgotado</span>;
+    }
     return (
       <div className={`flex items-center justify-center ${className}`}>
         <Badge
@@ -56,6 +61,18 @@ export function CountdownTimer({
           Tempo esgotado — preço promocional indisponível
         </Badge>
       </div>
+    );
+  }
+
+  if (inline) {
+    return (
+      <span
+        className={`font-mono font-semibold ${className}`}
+        aria-live="polite"
+      >
+        {minutes.toString().padStart(2, "0")}:
+        {seconds.toString().padStart(2, "0")}
+      </span>
     );
   }
 

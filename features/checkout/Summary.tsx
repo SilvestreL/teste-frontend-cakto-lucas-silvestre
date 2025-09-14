@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { UrgencyElements } from "@/components/urgency/UrgencyElements";
+import { CountdownTimer } from "@/components/urgency/CountdownTimer";
+import { SocialProof } from "@/components/urgency/SocialProof";
 import { MobileProductHeader } from "@/components/mobile/MobileProductHeader";
 import { MobileUrgencyElements } from "@/components/mobile/MobileUrgencyElements";
 import { MobileSummaryCompact } from "@/components/mobile/MobileSummaryCompact";
@@ -142,47 +144,52 @@ export function Summary({ product, formData }: SummaryProps) {
             )}
           </div>
 
-          <div className="space-y-3">
+          {/* Bloco 1: Preços - DESTAQUE PRINCIPAL */}
+          <div className="space-y-4 p-4 bg-surface-2/80 rounded-lg border border-border/50">
+            {/* Preço original - menor, em cinza */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary">
+              <span className="text-xs text-text-secondary">
                 Preço original
               </span>
-              <span className="text-sm text-text-secondary line-through">
+              <span className="text-xs text-text-secondary line-through">
                 {formatBRL(product.originalPrice)}
               </span>
             </div>
 
+            {/* Preço promocional - ELEMENTO PRINCIPAL */}
             <div className="flex items-center justify-between">
               <span className="text-sm text-text-secondary">
                 {isExpired ? "Preço original" : "Preço promocional"}
               </span>
-              <span className="text-lg font-bold text-text-primary">
+              <span className="text-3xl font-bold text-text-primary">
                 {formatBRL(effectivePrice)}
               </span>
             </div>
 
+            {/* Economia - badge verde pequeno */}
             {savings > 0 && (
-              <div className="flex items-center justify-between p-3 rounded-lg bg-brand/5 border border-brand/20">
-                <div className="flex items-center space-x-2">
-                  <TrendingDown className="h-4 w-4 text-brand" />
-                  <span className="text-brand font-semibold text-sm">
-                    Você economiza
-                  </span>
-                </div>
-                <span className="text-brand font-bold text-lg">
-                  {formatBRL(savings)}
-                </span>
+              <div className="flex items-center justify-center">
+                <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs px-2 py-1">
+                  <TrendingDown className="h-3 w-3 mr-1" />
+                  Economiza {formatBRL(savings)}
+                </Badge>
               </div>
             )}
           </div>
 
-          {/* Elementos de urgência */}
-          <UrgencyElements
-            showCountdown={true}
-            showSocialProof={true}
-            countdownMinutes={10}
-            className="mt-4"
-          />
+          {/* Bloco 2: Tempo limitado */}
+          <div className="p-3 bg-amber-50/5 border border-amber-200/20 rounded-lg">
+            <div className="flex items-center justify-center gap-2 text-amber-600">
+              <Clock className="h-4 w-4" />
+              <span className="text-sm font-medium">Tempo limitado:</span>
+              <CountdownTimer initialMinutes={10} inline={true} />
+            </div>
+          </div>
+
+          {/* Bloco 3: Visualizações */}
+          <div className="p-3 bg-surface-2 border border-border/30 rounded-lg">
+            <SocialProof />
+          </div>
         </div>
 
         <Separator className="bg-border/40" />
