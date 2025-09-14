@@ -120,7 +120,7 @@ export function PaymentOptions({
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-text-secondary" />
                   <p className="text-sm text-text-secondary">
-                    Até 12x sem juros
+                    Parcela em até 12x
                   </p>
                 </div>
               </div>
