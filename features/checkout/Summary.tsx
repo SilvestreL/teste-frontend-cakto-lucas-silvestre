@@ -54,7 +54,7 @@ export function Summary({ product, formData }: SummaryProps) {
 
   return (
     <Card className="p-4 sm:p-6 bg-surface border-border">
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:spimage.pngace-y-6">
         {/* Mobile: Cabeçalho compacto */}
         <div className="block sm:hidden">
           <MobileProductHeader
@@ -130,65 +130,54 @@ export function Summary({ product, formData }: SummaryProps) {
           />
         </div>
 
-        {/* Desktop: Pricing Section */}
-        <div className="hidden sm:block space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-lg font-bold text-text-primary">
-              Resumo do pedido
-            </h4>
-            {savings > 0 && (
-              <Badge className="bg-brand/10 text-brand border-brand/20 font-semibold">
-                <TrendingDown className="h-3 w-3 mr-1" />
-                {savingsPercent}% OFF
-              </Badge>
-            )}
-          </div>
+        {/* Desktop: Pricing Section - COMPACTO E FOCADO */}
+        <div className="hidden sm:block space-y-3">
+          <h4 className="text-lg font-bold text-text-primary">
+            Resumo do pedido
+          </h4>
 
-          {/* Bloco 1: Preços - DESTAQUE PRINCIPAL */}
-          <div className="space-y-4 p-4 bg-surface-2/80 rounded-lg border border-border/50">
-            {/* Preço original - menor, em cinza */}
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-text-secondary">
-                Preço original
-              </span>
-              <span className="text-xs text-text-secondary line-through">
-                {formatBRL(product.originalPrice)}
-              </span>
-            </div>
-
-            {/* Preço promocional - ELEMENTO PRINCIPAL */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary">
-                {isExpired ? "Preço original" : "Preço promocional"}
-              </span>
-              <span className="text-3xl font-bold text-text-primary">
-                {formatBRL(effectivePrice)}
-              </span>
-            </div>
-
-            {/* Economia - badge verde pequeno */}
-            {savings > 0 && (
-              <div className="flex items-center justify-center">
-                <Badge className="bg-green-500/10 text-green-600 border-green-500/20 text-xs px-2 py-1">
-                  <TrendingDown className="h-3 w-3 mr-1" />
-                  Economiza {formatBRL(savings)}
-                </Badge>
+          {/* Preço original vs Promocional - SEM DUPLICIDADE */}
+          <div className="p-4 bg-surface-2/80 rounded-lg border border-border/50">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-text-secondary">
+                  Preço original
+                </span>
+                <span className="text-sm text-text-secondary line-through">
+                  {formatBRL(product.originalPrice)}
+                </span>
               </div>
-            )}
-          </div>
-
-          {/* Bloco 2: Tempo limitado */}
-          <div className="p-3 bg-amber-50/5 border border-amber-200/20 rounded-lg">
-            <div className="flex items-center justify-center gap-2 text-amber-600">
-              <Clock className="h-4 w-4" />
-              <span className="text-sm font-medium">Tempo limitado:</span>
-              <CountdownTimer initialMinutes={10} inline={true} />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-text-primary">
+                    Preço promocional
+                  </span>
+                  {savings > 0 && (
+                    <Badge className="bg-success/10 text-success border-success/20 text-xs px-2 py-0.5">
+                      <TrendingDown className="h-3 w-3 mr-1" />
+                      {savingsPercent}% OFF
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-2xl font-bold text-text-primary">
+                  {formatBRL(effectivePrice)}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Bloco 3: Visualizações */}
-          <div className="p-3 bg-surface-2 border border-border/30 rounded-lg">
-            <SocialProof />
+          {/* Urgência e Social Proof - COMPACTO */}
+          <div className="space-y-2">
+            <div className="p-1.5 bg-amber-50/5 border border-amber-200/20 rounded-md">
+              <div className="flex items-center justify-center gap-1.5 text-amber-600">
+                <Clock className="h-2.5 w-2.5" />
+                <span className="text-xs font-medium">Tempo limitado:</span>
+                <CountdownTimer initialMinutes={10} inline={true} />
+              </div>
+            </div>
+            <div className="p-1.5 bg-surface-2 border border-border/30 rounded-md">
+              <SocialProof />
+            </div>
           </div>
         </div>
 
@@ -198,121 +187,168 @@ export function Summary({ product, formData }: SummaryProps) {
         <div className="block sm:hidden">
           <MobileDetailsAccordion title="Detalhes do pagamento">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-text-secondary">
-                  Método escolhido
-                </span>
-                <div className="flex items-center space-x-2">
-                  {formData.paymentMethod === "pix" ? (
-                    <Badge className="bg-brand text-brand-foreground text-xs px-2 py-0.5 h-auto">
-                      <Zap className="h-3 w-3 mr-1" />
-                      PIX • 0% taxa
-                    </Badge>
-                  ) : (
-                    <Badge
-                      variant="secondary"
-                      className="bg-surface-2 text-text-primary border-border text-xs px-2 py-0.5 h-auto"
-                    >
-                      <CreditCard className="h-3 w-3 mr-1" />
-                      Cartão • {formattedPricing.rate}
-                    </Badge>
-                  )}
+              {/* Cálculo completo - HIERARQUIA VISUAL CLARA */}
+              <div className="space-y-2">
+                {/* 1. Valor original */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-text-secondary">
+                    Valor original
+                  </span>
+                  <span className="text-xs text-text-secondary line-through">
+                    {formatBRL(product.originalPrice)}
+                  </span>
                 </div>
-              </div>
 
-              {formData.paymentMethod === "card" &&
-                formData.installments > 1 && (
+                {/* 2. Desconto aplicado */}
+                {savings > 0 && (
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-text-secondary">
-                      Parcelamento
+                      Desconto aplicado
                     </span>
-                    <span className="text-xs font-medium text-text-primary">
-                      {formData.installments}x de {formatBRL(monthlyValue)}
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-semibold text-success">
+                        -{formatBRL(savings)}
+                      </span>
+                      <Badge className="bg-success text-success-foreground text-xs px-1.5 py-0.5 font-bold">
+                        {savingsPercent}% OFF
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Novo valor com desconto - DESTAQUE COMO PONTO DE PARTIDA */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-white">
+                    Valor com desconto
+                  </span>
+                  <span className="text-base font-bold text-white">
+                    {formatBRL(effectivePrice)}
+                  </span>
+                </div>
+
+                {/* 4. Taxa do cartão (quando houver) - MAIS CLARA */}
+                {formData.paymentMethod === "card" && feeAmount > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-text-secondary/70">
+                      Taxa do cartão ({formData.installments}x) incluída
+                    </span>
+                    <span className="text-xs text-text-secondary/70">
+                      +{formatBRL(feeAmount)}
                     </span>
                   </div>
                 )}
 
-              {feeAmount > 0 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-text-secondary">
-                    Taxa do cartão
-                  </span>
-                  <span className="text-xs text-text-primary">
-                    + {formatBRL(feeAmount)}
-                  </span>
-                </div>
-              )}
+                {/* Separador visual - SIMBOLIZA SOMA FINAL */}
+                <Separator className="bg-border/40" />
 
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-text-secondary">
-                  Produtor recebe (líquido)
-                </span>
-                <span className="font-semibold text-text-primary">
-                  {formatBRL(netValue)}
-                </span>
+                {/* 5. Valor final - REMOVIDO PARA EVITAR REDUNDÂNCIA */}
+                {/* O valor final será mostrado apenas no "Total a pagar" abaixo */}
+              </div>
+
+              {/* Forma de pagamento - RODAPÉ EM CINZA CLARO */}
+              <div className="flex items-center justify-center pt-3 border-t border-border/20">
+                {formData.paymentMethod === "pix" ? (
+                  <div className="flex items-center gap-1.5 text-text-secondary/70">
+                    <Zap className="h-3 w-3" />
+                    <span className="text-xs">PIX</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-text-secondary/70">
+                    <CreditCard className="h-3 w-3" />
+                    <span className="text-xs">
+                      Cartão de crédito • {formData.installments}x de{" "}
+                      {formatBRL(monthlyValue)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </MobileDetailsAccordion>
         </div>
 
-        {/* Desktop: Payment Details Section */}
-        <div className="hidden sm:block space-y-4">
-          <h5 className="font-semibold text-text-primary">
-            Detalhes do pagamento
-          </h5>
+        {/* Desktop: Payment Details Section - SIMPLIFICADO */}
+        <div className="hidden sm:block">
+          <div className="p-4 bg-surface-2/50 rounded-lg border border-border/30">
+            <h5 className="text-sm font-semibold text-text-primary mb-4">
+              Detalhes do pagamento
+            </h5>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary">
-                Método escolhido
-              </span>
-              <div className="flex items-center space-x-2">
+            <div className="space-y-4">
+              {/* Cálculo completo - HIERARQUIA VISUAL CLARA */}
+              <div className="space-y-3">
+                {/* 1. Valor original */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-text-secondary">
+                    Valor original
+                  </span>
+                  <span className="text-sm text-text-secondary line-through">
+                    {formatBRL(product.originalPrice)}
+                  </span>
+                </div>
+
+                {/* 2. Desconto aplicado */}
+                {savings > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">
+                      Desconto aplicado
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-success">
+                        -{formatBRL(savings)}
+                      </span>
+                      <Badge className="bg-success text-success-foreground text-xs px-2 py-1 font-bold">
+                        {savingsPercent}% OFF
+                      </Badge>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Novo valor com desconto - DESTAQUE COMO PONTO DE PARTIDA */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-white">
+                    Valor com desconto
+                  </span>
+                  <span className="text-xl font-bold text-white">
+                    {formatBRL(effectivePrice)}
+                  </span>
+                </div>
+
+                {/* 4. Taxa do cartão (quando houver) - MAIS CLARA */}
+                {formData.paymentMethod === "card" && feeAmount > 0 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-text-secondary/70">
+                      Taxa do cartão ({formData.installments}x) incluída
+                    </span>
+                    <span className="text-xs text-text-secondary/70">
+                      +{formatBRL(feeAmount)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Separador visual - SIMBOLIZA SOMA FINAL */}
+                <Separator className="bg-border/40" />
+
+                {/* 5. Valor final - REMOVIDO PARA EVITAR REDUNDÂNCIA */}
+                {/* O valor final será mostrado apenas no "Total a pagar" abaixo */}
+              </div>
+
+              {/* Forma de pagamento - RODAPÉ EM CINZA CLARO */}
+              <div className="flex items-center justify-center pt-3 border-t border-border/20">
                 {formData.paymentMethod === "pix" ? (
-                  <Badge className="bg-brand text-brand-foreground">
-                    <Zap className="h-3 w-3 mr-1" />
-                    PIX • 0% taxa
-                  </Badge>
+                  <div className="flex items-center gap-2 text-text-secondary/70">
+                    <Zap className="h-4 w-4" />
+                    <span className="text-sm">PIX</span>
+                  </div>
                 ) : (
-                  <Badge
-                    variant="secondary"
-                    className="bg-surface-2 text-text-primary border-border"
-                  >
-                    <CreditCard className="h-3 w-3 mr-1" />
-                    Cartão • {formattedPricing.rate}
-                  </Badge>
+                  <div className="flex items-center gap-2 text-text-secondary/70">
+                    <CreditCard className="h-4 w-4" />
+                    <span className="text-sm">
+                      Cartão de crédito • {formData.installments}x de{" "}
+                      {formatBRL(monthlyValue)}
+                    </span>
+                  </div>
                 )}
               </div>
-            </div>
-
-            {formData.paymentMethod === "card" && formData.installments > 1 && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-text-secondary">
-                  Parcelamento
-                </span>
-                <span className="text-sm font-medium text-text-primary">
-                  {formData.installments}x de {formatBRL(monthlyValue)}
-                </span>
-              </div>
-            )}
-
-            {feeAmount > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-text-secondary">
-                  Taxa do cartão
-                </span>
-                <span className="text-sm text-text-primary">
-                  + {formatBRL(feeAmount)}
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-text-secondary">
-                Produtor recebe (líquido)
-              </span>
-              <span className="font-semibold text-text-primary">
-                {formatBRL(netValue)}
-              </span>
             </div>
           </div>
         </div>
@@ -331,58 +367,40 @@ export function Summary({ product, formData }: SummaryProps) {
           </div>
         </div>
 
-        {/* Desktop: Total Section */}
-        <div className="hidden sm:block space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-text-primary">
-              Total a pagar
-            </span>
-            <span className="text-2xl font-bold text-text-primary">
-              {formatBRL(total)}
-            </span>
-          </div>
+        {/* Desktop: Total Section - DESTAQUE MÁXIMO */}
+        <div className="hidden sm:block">
+          <div className="p-4 bg-brand/5 border-2 border-brand/20 rounded-lg">
+            <div className="text-center mb-3">
+              <span className="text-xs text-text-secondary/70 font-medium">
+                Resumo final
+              </span>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-lg font-bold text-text-primary">
+                Total a pagar
+              </span>
+              <span className="text-3xl font-bold text-brand">
+                {formatBRL(total)}
+              </span>
+            </div>
 
-          {/* Payment Method Benefits */}
-          {formData.paymentMethod === "pix" ? (
-            <div className="p-4 rounded-xl bg-brand/10 border border-brand/20">
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-lg bg-brand/20 flex items-center justify-center flex-shrink-0">
-                  <Zap className="h-5 w-5 text-brand" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-brand font-bold text-sm">
-                    PIX - Aprovação instantânea!
-                  </p>
-                  <p className="text-xs text-brand/80">
-                    Sem taxas • Acesso imediato • Pagamento seguro
-                  </p>
+            {/* Payment Method Benefits - Integrado */}
+            {formData.paymentMethod === "pix" ? (
+              <div className="flex items-center justify-center">
+                <div className="bg-brand text-brand-foreground px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-medium">
+                  <Zap className="h-3 w-3" />
+                  <span>PIX • 0% taxa • Acesso imediato</span>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="p-4 rounded-xl bg-surface-2 border border-border">
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center flex-shrink-0 border border-border">
-                  <Shield className="h-5 w-5 text-text-secondary" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-text-primary font-semibold text-sm">
-                    Cartão de Crédito
-                  </p>
-                  <div className="flex items-center gap-4 text-xs text-text-secondary">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      <span>Aprovação em minutos</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Shield className="h-3 w-3" />
-                      <span>Pagamento seguro</span>
-                    </div>
-                  </div>
+            ) : (
+              <div className="flex items-center justify-center">
+                <div className="bg-surface-2 text-text-secondary px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-medium">
+                  <CreditCard className="h-3 w-3" />
+                  <span>Cartão • Parcelamento • Aprovação rápida</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </Card>
