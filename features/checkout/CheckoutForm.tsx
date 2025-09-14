@@ -202,7 +202,7 @@ export function CheckoutForm({
         <Button
           type="submit"
           onClick={handleSubmit(onSubmit)}
-          className="w-full bg-brand hover:bg-brand-hover text-brand-foreground py-6 text-lg font-semibold transition-all duration-200 disabled:opacity-50"
+          className="w-full bg-brand hover:bg-brand-hover text-brand-foreground py-6 text-lg font-semibold transition-all duration-200 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           disabled={!isValid || isSubmitting}
         >
           {isSubmitting ? (
