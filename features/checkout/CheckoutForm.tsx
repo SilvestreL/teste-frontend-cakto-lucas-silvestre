@@ -233,15 +233,17 @@ export function CheckoutForm({
           />
 
           {/* Installments (only for card) */}
-          <div className="space-y-4 pt-4 border-t border-border">
-            <Label className="text-text-primary font-medium">
-              Parcelamento
-            </Label>
-            <InstallmentsSelect
-              productValue={effectivePrice}
-              onChange={handleInstallmentsChange}
-            />
-          </div>
+          {watchedPaymentMethod === "card" && (
+            <div className="space-y-4 pt-4 border-t border-border">
+              <Label className="text-text-primary font-medium">
+                Parcelamento
+              </Label>
+              <InstallmentsSelect
+                productValue={effectivePrice}
+                onChange={handleInstallmentsChange}
+              />
+            </div>
+          )}
         </div>
       </Card>
 
