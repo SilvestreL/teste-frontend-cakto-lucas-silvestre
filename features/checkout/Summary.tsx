@@ -85,7 +85,8 @@ export function Summary({ product, formData }: SummaryProps) {
             <img
               src={product.image || "/placeholder.svg"}
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
+              style={{ objectPosition: "center 30%" }}
             />
           </div>
           <div className="space-y-3">
