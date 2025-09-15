@@ -21,6 +21,7 @@ import {
   TrendingDown,
   CreditCard,
   Check,
+  Clock,
 } from "lucide-react";
 
 interface MobileSummaryProps {
@@ -30,7 +31,30 @@ interface MobileSummaryProps {
 
 export function MobileSummary({ product, formData }: MobileSummaryProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { isExpired } = useCountdown(10); // 10 minutos de desconto
+  const {
+    isExpired,
+    minutes = 0,
+    seconds = 0,
+    totalSecondsLeft = 0,
+  } = useCountdown(10); // 10 minutos de desconto
+
+  // Helpers para o timer de oferta
+  const totalDurationSec = 10 * 60; // 600 segundos (10 minutos)
+  const fmt2 = (n: number) => String(n).padStart(2, "0");
+  const timeLeft = `${fmt2(minutes)}:${fmt2(seconds)}`;
+
+  const urgency: "calm" | "warning" | "urgent" = isExpired
+    ? "calm"
+    : totalSecondsLeft < 120
+    ? "urgent"
+    : totalSecondsLeft < 300
+    ? "warning"
+    : "calm";
+
+  const progress = Math.max(
+    0,
+    Math.min(1, totalSecondsLeft / totalDurationSec)
+  );
 
   // Memoizar cálculos para evitar re-renders custosos
   const calculations = useMemo(() => {
@@ -192,7 +216,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
 
                   {/* 2) Chip PIX com reforço */}
                   {isPix && (
-                    <div className="flex flex-col items-center gap-2 mt-2">
+                    <div className="flex flex-col items-center gap-1.5 mt-2">
                       <div className="flex flex-wrap items-center justify-center gap-2 min-w-0">
                         <span className="md:hidden">
                           <Badge className="bg-brand/10 text-brand border-brand/20 text-[11px] px-3 py-1.5">
@@ -208,6 +232,41 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                       <div className="text-[11px] text-success font-medium text-center">
                         Melhor preço garantido com PIX
                       </div>
+
+                      {/* TIMER BADGE - integrado com PIX */}
+                      <div className="flex justify-center">
+                        {!isExpired ? (
+                          <span
+                            className={[
+                              "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-medium",
+                              urgency === "calm" &&
+                                "bg-surface-2 text-text-secondary border-border",
+                              urgency === "warning" &&
+                                "bg-amber-900/20 text-amber-300 border-amber-600/40",
+                              urgency === "urgent" &&
+                                "bg-red-900/25 text-red-300 border-red-600/40 animate-pulse",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            aria-live="polite"
+                            aria-atomic="true"
+                            title={`Oferta por tempo limitado. Termina em ${timeLeft}`}
+                            data-testid="deal-timer-badge"
+                            style={{ fontFeatureSettings: "'tnum' 1" }}
+                          >
+                            <Clock className="h-3 w-3" />
+                            Oferta termina em{" "}
+                            <span className="tabular-nums">{timeLeft}</span>
+                          </span>
+                        ) : (
+                          <span
+                            className="text-[11px] text-red-300/80 font-medium"
+                            data-testid="deal-timer-expired"
+                          >
+                            ⚠ Oferta encerrada — preço original aplicado
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -217,6 +276,41 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                       <p className="text-xs text-text-primary font-medium leading-tight line-clamp-1 break-words min-w-0">
                         {getInstallmentLabel()}
                       </p>
+
+                      {/* TIMER BADGE - integrado com Cartão */}
+                      <div className="flex justify-center mt-1.5">
+                        {!isExpired ? (
+                          <span
+                            className={[
+                              "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-medium",
+                              urgency === "calm" &&
+                                "bg-surface-2 text-text-secondary border-border",
+                              urgency === "warning" &&
+                                "bg-amber-900/20 text-amber-300 border-amber-600/40",
+                              urgency === "urgent" &&
+                                "bg-red-900/25 text-red-300 border-red-600/40 animate-pulse",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            aria-live="polite"
+                            aria-atomic="true"
+                            title={`Oferta por tempo limitado. Termina em ${timeLeft}`}
+                            data-testid="deal-timer-badge"
+                            style={{ fontFeatureSettings: "'tnum' 1" }}
+                          >
+                            <Clock className="h-3 w-3" />
+                            Oferta termina em{" "}
+                            <span className="tabular-nums">{timeLeft}</span>
+                          </span>
+                        ) : (
+                          <span
+                            className="text-[11px] text-red-300/80 font-medium"
+                            data-testid="deal-timer-expired"
+                          >
+                            ⚠ Oferta encerrada — preço original aplicado
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
