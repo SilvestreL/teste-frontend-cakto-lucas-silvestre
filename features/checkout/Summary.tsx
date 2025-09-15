@@ -146,8 +146,7 @@ export function Summary({ product, formData }: SummaryProps) {
             {/* Texto de urgência */}
             <div className="text-center">
               <span className="text-xs text-text-primary">
-                Você tem <span className="font-bold">tempo limitado</span> para
-                aproveitar o preço promocional.
+                <span className="font-bold">Oferta por tempo limitado!</span>
               </span>
             </div>
 
@@ -224,8 +223,7 @@ export function Summary({ product, formData }: SummaryProps) {
             {/* Texto de urgência */}
             <div className="text-center">
               <span className="text-sm text-text-primary">
-                Você tem <span className="font-bold">tempo limitado</span> para
-                aproveitar o preço promocional.
+                <span className="font-bold">Oferta por tempo limitado!</span>
               </span>
             </div>
 

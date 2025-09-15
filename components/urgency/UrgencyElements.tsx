@@ -21,11 +21,9 @@ export function UrgencyElements({
       {showCountdown && (
         <div className="space-y-2">
           <p className="text-xs text-text-secondary leading-relaxed">
-            Você tem{" "}
             <span className="font-semibold text-text-primary">
-              tempo limitado
-            </span>{" "}
-            para aproveitar o preço promocional.
+              Oferta por tempo limitado!
+            </span>
           </p>
           <CountdownTimer initialMinutes={countdownMinutes} />
         </div>
