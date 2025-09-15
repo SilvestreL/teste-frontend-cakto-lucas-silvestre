@@ -83,7 +83,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
               <div className="flex-1 min-w-0 space-y-2">
                 {/* Linha 1: Título + Botão */}
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-semibold text-text-primary line-clamp-1 flex-1">
+                  <h3 className="text-base font-semibold text-text-primary line-clamp-2 flex-1">
                     {product.name}
                   </h3>
                   <div className="flex items-center space-x-1 ml-2">
@@ -126,13 +126,19 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                         <span className="text-sm font-medium text-text-primary">
                           PIX
                         </span>
+                        <Badge className="bg-brand/10 text-brand border-brand/20 text-[9px] px-1.5 py-0.5">
+                          0% taxa
+                        </Badge>
                       </>
                     ) : (
                       <>
                         <CreditCard className="h-4 w-4 text-text-primary" />
                         <span className="text-sm font-medium text-text-primary">
-                          Cartão de crédito
+                          Cartão
                         </span>
+                        <Badge className="bg-surface-2 text-text-secondary border-border text-[9px] px-1.5 py-0.5">
+                          até 12x
+                        </Badge>
                       </>
                     )}
                   </div>
