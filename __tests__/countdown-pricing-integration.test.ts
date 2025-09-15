@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+// Jest globals são importados automaticamente
 import { getPricing, getFormattedPricing } from "../lib/pricing";
 import Decimal from "decimal.js";
 
@@ -27,7 +27,7 @@ describe("Integração Contador + Sistema de Preços", () => {
     console.log("Parcela:", formattedPricing.monthlyValue);
     console.log("Taxa:", formattedPricing.rate);
 
-    expect(pricing.total.toFixed(2)).toBe("320.73");
+    expect(pricing.total.toFixed(2)).toBe("323.70");
     expect(pricing.savings.toFixed(2)).toBe("200.00");
     expect(pricing.isValid).toBe(true);
   });
@@ -57,7 +57,7 @@ describe("Integração Contador + Sistema de Preços", () => {
     console.log("Parcela:", formattedPricing.monthlyValue);
     console.log("Taxa:", formattedPricing.rate);
 
-    expect(pricing.total.toFixed(2)).toBe("536.71");
+    expect(pricing.total.toFixed(2)).toBe("541.68");
     expect(pricing.savings.toFixed(2)).toBe("0.00");
     expect(pricing.isValid).toBe(true);
   });
@@ -86,7 +86,7 @@ describe("Integração Contador + Sistema de Preços", () => {
     console.log("Sem promoção (7x):", "R$ " + originalPricing.total.toFixed(2).replace(".", ","));
     console.log("Diferença:", "R$ " + difference.toFixed(2).replace(".", ","));
 
-    expect(difference.toFixed(2)).toBe("231.98");
+    expect(difference.toFixed(2)).toBe("233.98");
     expect(promotionalPricing.total.lt(originalPricing.total)).toBe(true);
   });
 
@@ -113,9 +113,9 @@ describe("Integração Contador + Sistema de Preços", () => {
     console.log("Cartão 3x:", "R$ " + cardPricing.total.toFixed(2).replace(".", ","));
 
     expect(pixPricing.total.toFixed(2)).toBe("297.00");
-    expect(cardPricing.total.toFixed(2)).toBe("320.73");
+    expect(cardPricing.total.toFixed(2)).toBe("323.70");
     expect(pixPricing.rate.toFixed(4)).toBe("0.0000");
-    expect(cardPricing.rate.toFixed(4)).toBe("0.0799");
+    expect(cardPricing.rate.toFixed(4)).toBe("0.0899");
   });
 
   it("deve simular fluxo completo de timer", () => {

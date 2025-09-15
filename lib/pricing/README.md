@@ -105,10 +105,10 @@ lastValue = total - (monthlyValue × (installments - 1))
 
 ```bash
 # Executar todos os testes
-pnpm vitest run lib/pricing
+pnpm test lib/pricing
 
 # Executar com watch
-pnpm vitest lib/pricing
+pnpm test:watch lib/pricing
 
 # Executar exemplo
 pnpm tsx lib/pricing/example.ts
@@ -301,7 +301,7 @@ console.log("Pricing result:", {
 ## 📚 Referências
 
 - [Decimal.js](https://mikemcl.github.io/decimal.js/) - Biblioteca de precisão decimal
-- [Vitest](https://vitest.dev/) - Framework de testes
+- [Jest](https://jestjs.io/) - Framework de testes
 - [TypeScript](https://www.typescriptlang.org/) - Linguagem de programação
 
 ---
