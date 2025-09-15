@@ -21,6 +21,7 @@ import { maskCPF } from "@/lib/cpf";
 import { getPricing } from "@/lib/pricing";
 import Decimal from "decimal.js";
 import Link from "next/link";
+import { PaymentLoadingOverlay } from "@/components/ui/payment-loading-overlay";
 
 interface SuccessStateProps {
   orderId: string;
@@ -92,6 +93,7 @@ function getMockOrderData(
 export function SuccessState({ orderId, formData }: SuccessStateProps) {
   const [orderData] = useState(() => getMockOrderData(orderId, formData));
   const [copied, setCopied] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const copyPixCode = async () => {
     if (orderData.pixCode) {
@@ -99,6 +101,14 @@ export function SuccessState({ orderId, formData }: SuccessStateProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleNavigateHome = () => {
+    setIsNavigating(true);
+    // Simular delay de navegação
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1500);
   };
 
   const isPix = orderData.paymentMethod === "pix";
@@ -329,15 +339,15 @@ export function SuccessState({ orderId, formData }: SuccessStateProps) {
                 Acessar produto
               </Button>
             )}
-            <Link href="/" className="flex-1">
-              <Button
-                variant="outline"
-                className="w-full bg-transparent border-border text-text-primary hover:bg-surface"
-              >
-                Voltar ao início
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              className="w-full bg-transparent border-border text-text-primary hover:bg-surface flex-1"
+              onClick={handleNavigateHome}
+              disabled={isNavigating}
+            >
+              Voltar ao início
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
           </div>
 
           {/* Support */}
@@ -354,6 +364,12 @@ export function SuccessState({ orderId, formData }: SuccessStateProps) {
           </div>
         </div>
       </Container>
+
+      {/* Navigation Loading Overlay */}
+      <PaymentLoadingOverlay
+        open={isNavigating}
+        message="Redirecionando para o início..."
+      />
     </div>
   );
 }
