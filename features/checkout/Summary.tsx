@@ -2,18 +2,19 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
+import { UrgencyElements } from "@/components/urgency/UrgencyElements";
 import { CountdownTimer } from "@/components/urgency/CountdownTimer";
 import { SocialProof } from "@/components/urgency/SocialProof";
 import { MobileProductHeader } from "@/components/mobile/MobileProductHeader";
+import { MobileUrgencyElements } from "@/components/mobile/MobileUrgencyElements";
 import { MobileSummaryCompact } from "@/components/mobile/MobileSummaryCompact";
 import { MobileDetailsAccordion } from "@/components/mobile/MobileDetailsAccordion";
 import type { Product, CheckoutInput } from "@/types/checkout";
-import { formatBRL } from "@/lib/currency";
-import { getPricing } from "@/lib/pricing";
+import { formatBRL, formatPercent } from "@/lib/currency";
+import { getPricing, getFormattedPricing } from "@/lib/pricing";
 import Decimal from "decimal.js";
 import { useCountdown } from "@/lib/hooks/useCountdown";
-import { Zap, TrendingDown, Clock, CreditCard } from "lucide-react";
+import { Zap, TrendingDown, Shield, Clock, CreditCard } from "lucide-react";
 
 interface SummaryProps {
   product: Product;
@@ -36,9 +37,17 @@ export function Summary({ product, formData }: SummaryProps) {
     installments: formData.installments,
   });
 
+  const formattedPricing = getFormattedPricing({
+    originalValue: new Decimal(product.originalPrice),
+    currentValue: new Decimal(effectivePrice),
+    paymentMethod: formData.paymentMethod,
+    installments: formData.installments,
+  });
+
   // Valores para compatibilidade com o código existente
   const total = pricing.total.toNumber();
   const monthlyValue = pricing.monthlyValue.toNumber();
+  const netValue = pricing.netValue.toNumber();
   const savings = pricing.savings.toNumber();
   const feeAmount = pricing.feeAmount.toNumber();
   const savingsPercent = pricing.savingsPercentage.toFixed(0);
@@ -73,11 +82,9 @@ export function Summary({ product, formData }: SummaryProps) {
         {/* Desktop: Product Section */}
         <div className="hidden sm:block space-y-4">
           <div className="aspect-video rounded-xl bg-surface-2 overflow-hidden border border-border">
-            <Image
+            <img
               src={product.image || "/placeholder.svg"}
               alt={product.name}
-              width={400}
-              height={225}
               className="w-full h-full object-cover"
             />
           </div>
@@ -168,37 +175,6 @@ export function Summary({ product, formData }: SummaryProps) {
 
           {/* Preço + Desconto - BLOCO NEUTRO */}
           <div className="p-4 sm:p-5 bg-surface-2 border border-border/30 rounded-lg">
-            {/* Thumbnail do produto + Título */}
-            <div className="flex items-start space-x-3 mb-3">
-              <div className="w-16 h-16 rounded-lg bg-surface-2 overflow-hidden border border-border flex-shrink-0">
-                <Image
-                  src={product.image || "/placeholder.svg"}
-                  alt={product.name}
-                  width={64}
-                  height={64}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-text-primary line-clamp-2 mb-2">
-                  {product.name}
-                </h3>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] px-2 py-0.5 h-auto bg-surface-2 text-text-secondary border-border"
-                  >
-                    Produto digital
-                  </Badge>
-                  <Badge
-                    className="text-[10px] px-2 py-0.5 h-auto bg-brand/10 text-brand border-brand/20"
-                    aria-label="Liberação imediata após pagamento"
-                  >
-                    Liberação imediata
-                  </Badge>
-                </div>
-              </div>
-            </div>
             <div className="space-y-2">
               {/* Preço original */}
               <div className="flex items-center justify-between">
