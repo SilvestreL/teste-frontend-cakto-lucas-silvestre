@@ -14,8 +14,8 @@ const commonOrders = [
   {
     id: "CKT-1757968838221-2UE6BJFII",
     formData: {
-      email: "lucas.silvestre@gmail.com",
-      cpf: "07822816489",
+      email: "cliente@exemplo.com",
+      cpf: "12345678901",
       paymentMethod: "pix" as const,
       installments: 1,
     },

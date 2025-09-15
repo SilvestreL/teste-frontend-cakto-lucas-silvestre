@@ -22,10 +22,10 @@ export function CheckoutStateHydrator({ initial }: CheckoutStateHydratorProps) {
     if (hydrated.current) return;
     hydrated.current = true;
 
-    // Valores padrão se não fornecido initial
+    // Valores padrão se não fornecido initial (campos vazios para produção)
     const defaultData = {
-      email: "lucas.silvestre@gmail.com",
-      cpf: "07822816489",
+      email: "",
+      cpf: "",
       paymentMethod: "pix" as PaymentMethod,
       installments: 1,
     };

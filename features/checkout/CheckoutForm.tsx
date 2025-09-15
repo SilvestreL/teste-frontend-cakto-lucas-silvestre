@@ -94,14 +94,14 @@ export function CheckoutForm({
   useEffect(() => {
     if (isInitialized.current) return;
 
-    // Valores padrão para hidratação
+    // Valores padrão para hidratação (campos vazios para produção)
     reset({
-      email: "lucas.silvestre@gmail.com",
-      cpf: "07822816489",
+      email: "",
+      cpf: "",
       paymentMethod: "pix",
       installments: 1,
     });
-    setCpfValue(maskCPF("07822816489"));
+    setCpfValue("");
     isInitialized.current = true;
   }, [reset]);
 
