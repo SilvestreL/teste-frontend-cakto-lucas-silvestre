@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { RiCactusLine } from "react-icons/ri";
 
 interface PaymentLoadingOverlayProps {
   open: boolean;
@@ -35,26 +36,26 @@ export function PaymentLoadingOverlay({
         >
           {/* Logo com animação de pulse suave */}
           <motion.div
-            className="h-14 w-14 rounded-full bg-brand grid place-content-center text-brand-foreground font-bold text-xl"
-            animate={{ 
+            className="h-14 w-14 rounded-full bg-brand grid place-content-center text-brand-foreground"
+            animate={{
               scale: [1, 1.05, 1],
               boxShadow: [
                 "0 0 0 0 rgba(34, 197, 94, 0.4)",
                 "0 0 0 8px rgba(34, 197, 94, 0.1)",
-                "0 0 0 0 rgba(34, 197, 94, 0.4)"
-              ]
+                "0 0 0 0 rgba(34, 197, 94, 0.4)",
+              ],
             }}
-            transition={{ 
-              repeat: Infinity, 
-              duration: 2, 
-              ease: "easeInOut" 
+            transition={{
+              repeat: Infinity,
+              duration: 2,
+              ease: "easeInOut",
             }}
           >
-            C
+            <RiCactusLine className="h-8 w-8" />
           </motion.div>
 
           {/* Mensagem com tipografia consistente */}
-          <motion.div 
+          <motion.div
             className="text-center text-text-primary text-lg font-medium max-w-sm px-4"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -64,7 +65,7 @@ export function PaymentLoadingOverlay({
           </motion.div>
 
           {/* Barra de progresso com gradiente animado */}
-          <motion.div 
+          <motion.div
             className="w-56 h-1.5 rounded-full bg-surface-2 overflow-hidden"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -73,10 +74,10 @@ export function PaymentLoadingOverlay({
             <motion.div
               className="h-full w-1/3 bg-gradient-to-r from-brand/60 via-brand to-brand/80"
               animate={{ x: ["-100%", "300%"] }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 1.6, 
-                ease: "linear" 
+              transition={{
+                repeat: Infinity,
+                duration: 1.6,
+                ease: "linear",
               }}
             />
           </motion.div>

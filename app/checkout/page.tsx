@@ -7,6 +7,7 @@ import { Summary } from "@/features/checkout/Summary";
 import { MobileSummary } from "@/features/checkout/MobileSummary";
 import type { CheckoutInput } from "@/types/checkout";
 import { defaultProduct, generateMockOrderId } from "@/mocks";
+import { RiCactusLine } from "react-icons/ri";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function CheckoutPage() {
           <div className="flex items-center justify-center py-4">
             <div className="flex items-center space-x-3">
               <div className="h-8 w-8 rounded-lg bg-brand flex items-center justify-center">
-                <span className="text-brand-foreground font-bold">C</span>
+                <RiCactusLine className="text-brand-foreground text-lg" />
               </div>
               <span className="text-xl font-bold text-text-primary">
                 Demonstração de Checkout

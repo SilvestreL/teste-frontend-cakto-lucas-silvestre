@@ -15,6 +15,7 @@ import {
   Clock,
   Zap,
 } from "lucide-react";
+import { RiCactusLine } from "react-icons/ri";
 import { formatBRL } from "@/lib/currency";
 import { maskCPF } from "@/lib/cpf";
 import { getPricing } from "@/lib/pricing";
@@ -111,11 +112,11 @@ export function SuccessState({ orderId, formData }: SuccessStateProps) {
           <div className="flex items-center justify-center py-4">
             <div className="flex items-center space-x-2">
               <div className="h-6 w-6 rounded bg-brand flex items-center justify-center">
-                <span className="text-brand-foreground font-bold text-sm">
-                  C
-                </span>
+                <RiCactusLine className="text-brand-foreground text-sm" />
               </div>
-              <span className="text-h3 text-text-primary">Cakto</span>
+              <span className="text-h3 text-text-primary">
+                Demonstração de Checkout
+              </span>
             </div>
           </div>
         </Container>
