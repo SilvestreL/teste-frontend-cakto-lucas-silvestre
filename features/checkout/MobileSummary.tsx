@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,80 +50,105 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
   const netValue = pricing.netValue.toNumber();
   const feeAmount = pricing.feeAmount.toNumber();
   const rate = pricing.rate.toNumber();
+  const savingsPercent = pricing.savingsPercentage.toFixed(0);
 
   return (
     <div className="border-b border-border bg-surface/50 backdrop-blur sticky top-0 z-40">
-      <div className="px-4 py-4">
+      <div className="px-3 py-2">
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+              className="w-full flex items-start p-0 h-auto hover:bg-transparent min-h-[40px] space-x-3"
             >
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-lg bg-surface-2 overflow-hidden border border-border">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="text-left">
-                  <p className="font-semibold text-text-primary text-sm leading-tight">
+              {/* Thumbnail do produto */}
+              <div className="w-12 h-12 rounded-lg bg-surface-2 overflow-hidden border border-border flex-shrink-0">
+                <Image
+                  src={product.image || "/placeholder.svg"}
+                  alt={product.name}
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Conteúdo principal */}
+              <div className="flex-1 min-w-0 space-y-2">
+                {/* Linha 1: Título + Botão */}
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-semibold text-text-primary line-clamp-1 flex-1">
                     {product.name}
-                  </p>
-                  <div className="flex flex-col gap-2 mt-1">
-                    <p className="text-xs text-text-secondary">
-                      por{" "}
-                      <span className="font-medium text-text-primary">
-                        {product.producer}
-                      </span>
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      <Badge
-                        variant="secondary"
-                        className="text-xs px-2 py-0.5 h-auto bg-surface-2 text-text-secondary border-border"
-                      >
-                        Produto digital
-                      </Badge>
-                      <Badge className="text-xs px-2 py-0.5 h-auto bg-brand/10 text-brand border-brand/20">
-                        Liberação imediata
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="font-bold text-text-primary">
-                      {formatBRL(total)}
+                  </h3>
+                  <div className="flex items-center space-x-1 ml-2">
+                    <span className="text-xs text-text-secondary">
+                      Ver resumo
                     </span>
-                    {formData.paymentMethod === "pix" ? (
-                      <Badge className="bg-brand text-brand-foreground text-xs">
-                        <Zap className="h-3 w-3 mr-1" />
-                        0% PIX
-                      </Badge>
+                    {isOpen ? (
+                      <ChevronUp className="h-3 w-3 text-text-secondary" />
                     ) : (
-                      <Badge variant="secondary" className="text-xs">
-                        <CreditCard className="h-3 w-3 mr-1" />
-                        {formatPercent(rate)}
-                      </Badge>
+                      <ChevronDown className="h-3 w-3 text-text-secondary" />
                     )}
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-text-secondary">Ver resumo</span>
-                {isOpen ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
+
+                {/* Linha 2: Badges Secundárias */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] px-2 py-0.5 h-auto bg-surface-2 text-text-secondary border-border"
+                  >
+                    Produto digital
+                  </Badge>
+                  <Badge
+                    className="text-[10px] px-2 py-0.5 h-auto bg-brand/10 text-brand border-brand/20"
+                    aria-label="Liberação imediata após pagamento"
+                  >
+                    Liberação imediata
+                  </Badge>
+                </div>
+
+                {/* Linha 3: Preço + Método de Pagamento */}
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-bold text-text-primary">
+                    {formatBRL(total)}
+                  </span>
+                  <div className="flex items-center space-x-1">
+                    {formData.paymentMethod === "pix" ? (
+                      <>
+                        <Zap className="h-4 w-4 text-brand" />
+                        <span className="text-sm font-medium text-text-primary">
+                          PIX
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="h-4 w-4 text-text-primary" />
+                        <span className="text-sm font-medium text-text-primary">
+                          Cartão de crédito
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Economia/Desconto - Destaque Horizontal */}
+                {savings > 0 && (
+                  <div className="flex items-center space-x-1">
+                    <TrendingDown className="h-3 w-3 text-success" />
+                    <span className="text-xs text-success font-medium">
+                      Você economiza {formatBRL(savings)} ({savingsPercent}%
+                      OFF)
+                    </span>
+                  </div>
                 )}
               </div>
             </Button>
           </CollapsibleTrigger>
 
           <CollapsibleContent className="mt-4">
-            <Card className="p-4 bg-surface border-border">
-              <div className="space-y-4">
-                <div className="space-y-3">
+            <Card className="p-3 bg-surface border-border">
+              <div className="space-y-2">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-secondary">Preço original</span>
                     <span className="text-text-secondary line-through">
@@ -150,13 +176,15 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                   )}
                 </div>
 
-                <div className="border-t border-border/40 pt-3 space-y-2">
+                <div className="border-t border-border/40 pt-2 space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-secondary">
                       Método de pagamento
                     </span>
-                    <span className="text-text-primary font-medium capitalize">
-                      {formData.paymentMethod}
+                    <span className="text-text-primary font-medium">
+                      {formData.paymentMethod === "pix"
+                        ? "PIX"
+                        : "Cartão de crédito"}
                     </span>
                   </div>
 
@@ -179,7 +207,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                   </div>
                 </div>
 
-                <div className="border-t border-border/40 pt-3">
+                <div className="border-t border-border/40 pt-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-text-primary">
                       Total a pagar
