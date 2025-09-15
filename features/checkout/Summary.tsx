@@ -79,16 +79,18 @@ export function Summary({ product, formData }: SummaryProps) {
           />
         </div>
 
-        {/* Desktop: Product Section */}
+        {/* Desktop: Product Section - SIMPLIFICADO */}
         <div className="hidden sm:block space-y-4">
-          <div className="aspect-video rounded-xl bg-surface-2 overflow-hidden border border-border">
+          {/* Imagem compacta */}
+          <div className="relative w-full h-40 rounded-lg bg-surface-2 border border-border overflow-hidden">
             <img
               src={product.image || "/placeholder.svg"}
               alt={product.name}
               className="w-full h-full object-cover object-center"
-              style={{ objectPosition: "center 30%" }}
+              style={{ objectPosition: "30% 10%" }}
             />
           </div>
+
           <div className="space-y-3">
             {/* Título principal */}
             <h3 className="text-lg font-bold text-text-primary leading-tight">

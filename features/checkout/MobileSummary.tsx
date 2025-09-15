@@ -1,6 +1,5 @@
 "use client";
 import { useState, useMemo } from "react";
-import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -168,18 +167,17 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full flex items-start p-0 h-auto hover:bg-transparent min-h-[60px] space-x-4"
+              className="w-full flex items-start p-0 h-auto hover:bg-transparent min-h-[80px] md:min-h-[96px] space-x-4"
               aria-expanded={isOpen}
               aria-controls="mobile-summary-details"
             >
               {/* Thumbnail do produto */}
-              <div className="w-16 h-16 rounded-xl bg-surface-2 overflow-hidden border border-border flex-shrink-0 shadow-sm">
-                <Image
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-surface-2 overflow-hidden border border-border flex-shrink-0 shadow-sm">
+                <img
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
-                  width={64}
-                  height={64}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
+                  style={{ objectPosition: "center 20%" }}
                 />
               </div>
 
