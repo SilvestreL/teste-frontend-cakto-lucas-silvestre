@@ -12,6 +12,7 @@ import {
 import type { Product, CheckoutInput } from "@/types/checkout";
 import { formatBRL, formatPercent } from "@/lib/currency";
 import { getPricing, getFormattedPricing } from "@/lib/pricing";
+import { useCountdown } from "@/lib/hooks/useCountdown";
 import Decimal from "decimal.js";
 import {
   ChevronDown,
@@ -28,18 +29,24 @@ interface MobileSummaryProps {
 
 export function MobileSummary({ product, formData }: MobileSummaryProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { isExpired } = useCountdown(10); // 10 minutos de desconto
+
+  // Usa preço promocional se o timer não expirou, senão usa preço original
+  const effectivePrice = isExpired
+    ? product.originalPrice
+    : product.currentPrice;
 
   // Usa o novo sistema de preços para cálculos precisos
   const pricing = getPricing({
     originalValue: new Decimal(product.originalPrice),
-    currentValue: new Decimal(product.currentPrice),
+    currentValue: new Decimal(effectivePrice),
     paymentMethod: formData.paymentMethod,
     installments: formData.installments,
   });
 
   const formattedPricing = getFormattedPricing({
     originalValue: new Decimal(product.originalPrice),
-    currentValue: new Decimal(product.currentPrice),
+    currentValue: new Decimal(effectivePrice),
     paymentMethod: formData.paymentMethod,
     installments: formData.installments,
   });
@@ -54,7 +61,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
 
   return (
     <div className="border-b border-border bg-surface/50 backdrop-blur sticky top-0 z-40">
-      <div className="px-3 py-2">
+      <div className="px-3 py-1.5">
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <Button
@@ -73,148 +80,143 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
               </div>
 
               {/* Conteúdo principal */}
-              <div className="flex-1 min-w-0 space-y-2">
-                {/* Linha 1: Título + Botão */}
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-semibold text-text-primary line-clamp-1 flex-1">
+              <div className="flex-1 min-w-0">
+                {/* Topo: Título + Badges */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-text-primary line-clamp-2">
                     {product.name}
                   </h3>
-                  <div className="flex items-center space-x-1 ml-2">
-                    <span className="text-xs text-text-secondary">
-                      Ver resumo
-                    </span>
-                    {isOpen ? (
-                      <ChevronUp className="h-3 w-3 text-text-secondary" />
-                    ) : (
-                      <ChevronDown className="h-3 w-3 text-text-secondary" />
-                    )}
+                  <div className="flex items-center gap-1.5">
+                    <Badge
+                      variant="secondary"
+                      className="text-[9px] px-1.5 py-0.5 h-auto bg-surface-2 text-text-secondary border-border"
+                    >
+                      Produto digital
+                    </Badge>
+                    <Badge className="text-[9px] px-1.5 py-0.5 h-auto bg-brand/10 text-brand border-brand/20">
+                      Liberação imediata
+                    </Badge>
                   </div>
                 </div>
+              </div>
 
-                {/* Linha 2: Badges Secundárias */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] px-2 py-0.5 h-auto bg-surface-2 text-text-secondary border-border"
-                  >
-                    Produto digital
-                  </Badge>
-                  <Badge
-                    className="text-[10px] px-2 py-0.5 h-auto bg-brand/10 text-brand border-brand/20"
-                    aria-label="Liberação imediata após pagamento"
-                  >
-                    Liberação imediata
-                  </Badge>
-                </div>
-
-                {/* Linha 3: Preço + Método de Pagamento */}
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-text-primary">
+              {/* Lado direito: Preço + Forma de pagamento */}
+              <div className="flex flex-col items-end space-y-1">
+                {/* Preço final em destaque */}
+                <div className="text-right">
+                  <div className="text-base font-bold text-text-primary">
                     {formatBRL(total)}
-                  </span>
-                  <div className="flex items-center space-x-1">
-                    {formData.paymentMethod === "pix" ? (
-                      <>
-                        <Zap className="h-4 w-4 text-brand" />
-                        <span className="text-sm font-medium text-text-primary">
-                          PIX
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="h-4 w-4 text-text-primary" />
-                        <span className="text-sm font-medium text-text-primary">
-                          Cartão de crédito
-                        </span>
-                      </>
-                    )}
                   </div>
                 </div>
 
-                {/* Economia/Desconto - Destaque Horizontal */}
-                {savings > 0 && (
-                  <div className="flex items-center space-x-1">
-                    <TrendingDown className="h-3 w-3 text-success" />
-                    <span className="text-xs text-success font-medium">
-                      Você economiza {formatBRL(savings)} ({savingsPercent}%
-                      OFF)
-                    </span>
-                  </div>
-                )}
+                {/* Pílula de forma de pagamento */}
+                <div className="flex items-center space-x-1">
+                  {formData.paymentMethod === "pix" ? (
+                    <>
+                      <Zap className="h-3 w-3 text-brand" />
+                      <span className="text-xs text-text-secondary">PIX</span>
+                      <Badge className="bg-brand/10 text-brand border-brand/20 text-[9px] px-1.5 py-0.5">
+                        0% taxa
+                      </Badge>
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-3 w-3 text-text-primary" />
+                      <span className="text-xs text-text-secondary">
+                        Cartão
+                      </span>
+                      <Badge className="bg-surface-2 text-text-secondary border-border text-[9px] px-1.5 py-0.5">
+                        até 12x
+                      </Badge>
+                    </>
+                  )}
+                </div>
+
+                {/* Botão para expandir */}
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs text-text-secondary">
+                    Ver resumo
+                  </span>
+                  {isOpen ? (
+                    <ChevronUp className="h-3 w-3 text-text-secondary" />
+                  ) : (
+                    <ChevronDown className="h-3 w-3 text-text-secondary" />
+                  )}
+                </div>
               </div>
             </Button>
           </CollapsibleTrigger>
 
-          <CollapsibleContent className="mt-4">
-            <Card className="p-3 bg-surface border-border">
+          <CollapsibleContent className="mt-3">
+            <Card className="p-3 bg-surface border-border space-y-3">
+              {/* Bloco central: Resumo de valores */}
               <div className="space-y-2">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-secondary">Preço original</span>
-                    <span className="text-text-secondary line-through">
-                      {formatBRL(product.originalPrice)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-secondary">
-                      Preço promocional
-                    </span>
-                    <span className="text-text-primary font-semibold">
-                      {formatBRL(product.currentPrice)}
-                    </span>
-                  </div>
-                  {savings > 0 && (
-                    <div className="flex items-center justify-between text-sm p-2 rounded bg-brand/10 border border-brand/20">
-                      <div className="flex items-center space-x-1">
-                        <TrendingDown className="h-3 w-3 text-brand" />
-                        <span className="text-brand font-medium">Economia</span>
-                      </div>
-                      <span className="text-brand font-semibold">
-                        {formatBRL(savings)}
-                      </span>
-                    </div>
-                  )}
+                {/* Preço original */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-text-secondary">Preço original</span>
+                  <span className="text-text-secondary line-through">
+                    {formatBRL(product.originalPrice)}
+                  </span>
                 </div>
 
-                <div className="border-t border-border/40 pt-2 space-y-2">
+                {/* Desconto aplicado */}
+                {savings > 0 && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-secondary">
-                      Método de pagamento
+                      Desconto aplicado
                     </span>
-                    <span className="text-text-primary font-medium">
-                      {formData.paymentMethod === "pix"
-                        ? "PIX"
-                        : "Cartão de crédito"}
-                    </span>
-                  </div>
-
-                  {feeAmount > 0 && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-secondary">
-                        Taxa do cartão
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-text-primary font-medium">
+                        -{formatBRL(savings)}
                       </span>
-                      <span className="text-text-primary">
-                        + {formatBRL(feeAmount)}
-                      </span>
+                      <Badge className="bg-success/10 text-success border-success/20 text-[9px] px-1.5 py-0.5">
+                        {savingsPercent}% OFF
+                      </Badge>
                     </div>
-                  )}
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-secondary">Produtor recebe</span>
-                    <span className="text-text-primary font-medium">
-                      {formatBRL(netValue)}
-                    </span>
                   </div>
+                )}
+
+                {/* Preço promocional - hierarquia reduzida */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-text-secondary">Preço promocional</span>
+                  <span className="text-text-primary font-medium">
+                    {formatBRL(effectivePrice)}
+                  </span>
                 </div>
 
-                <div className="border-t border-border/40 pt-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-text-primary">
+                {/* Taxa do cartão (se aplicável) */}
+                {feeAmount > 0 && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-secondary">Taxa do cartão</span>
+                    <span className="text-text-primary">
+                      + {formatBRL(feeAmount)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Rodapé: Total a pagar com destaque */}
+              <div className="border-t border-border/40 pt-3">
+                <div className="p-3 bg-success/5 border border-success/20 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-xs text-text-secondary mb-1">
                       Total a pagar
-                    </span>
-                    <span className="font-bold text-lg text-text-primary">
+                    </div>
+                    <div className="text-xl font-bold text-text-primary">
                       {formatBRL(total)}
-                    </span>
+                    </div>
+                    {formData.paymentMethod === "card" &&
+                      formData.installments > 1 && (
+                        <div className="text-xs text-text-secondary mt-1">
+                          {formData.installments}x de{" "}
+                          {formatBRL(pricing.monthlyValue.toNumber())}
+                        </div>
+                      )}
+                    {formData.paymentMethod === "pix" && (
+                      <div className="text-xs text-text-secondary mt-1">
+                        PIX • 0% taxa
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
