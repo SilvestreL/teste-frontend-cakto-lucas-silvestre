@@ -162,73 +162,66 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
               </div>
 
               {/* Conteúdo principal */}
-              <div className="flex-1 min-w-0 space-y-2">
-                {/* Linha 1: Título do produto */}
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm md:text-base font-semibold text-text-primary line-clamp-2 flex-1">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center space-x-1 ml-2">
-                    <span className="text-xs md:text-sm text-text-secondary">
-                      Ver detalhes
-                    </span>
-                    {isOpen ? (
-                      <ChevronUp className="h-3 w-3 text-text-secondary" />
-                    ) : (
-                      <ChevronDown className="h-3 w-3 text-text-secondary" />
-                    )}
+              <div className="flex-1 min-w-0">
+                {/* HEADER */}
+                <div className="flex flex-col gap-3">
+                  {/* 1) Título + Botão */}
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="min-w-0 flex-1 text-base md:text-lg font-semibold text-text-primary">
+                      {product.name}
+                    </h3>
+                    <button
+                      className="shrink-0 flex items-center gap-1 text-xs text-text-secondary"
+                      aria-expanded={isOpen}
+                      aria-controls="mobile-summary-details"
+                      aria-label={isOpen ? "Ocultar detalhes" : "Ver detalhes"}
+                    >
+                      {isOpen ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
-                </div>
 
-                {/* Linha 2: Total a pagar + Chip (mobile-first) */}
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span
-                      className="text-xl md:text-2xl font-bold text-text-primary"
+                  {/* 2) Preço - destaque maior */}
+                  <div className="text-center py-1">
+                    <div
+                      className="text-3xl md:text-4xl font-bold leading-none text-text-primary"
                       aria-live="polite"
-                      role="text"
-                      aria-label={`Total a pagar: ${formatBRL(total)}`}
                     >
                       {formatBRL(total)}
-                    </span>
-                    <span className="text-xs md:text-sm text-text-secondary">
+                    </div>
+                    <div className="text-xs md:text-sm text-text-secondary mt-1">
                       Total a pagar
-                    </span>
+                    </div>
                   </div>
 
-                  {/* Chip de método de pagamento com largura limitada */}
-                  <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
-                    {isPix ? (
-                      <Badge className="bg-brand/10 text-brand border-brand/20 text-xs md:text-sm px-2 py-1 h-auto max-w-[60%] sm:max-w-none truncate">
-                        PIX • 0% taxa • Acesso imediato
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-surface-2 text-text-secondary border-border text-xs md:text-sm px-2 py-1 h-auto max-w-[60%] sm:max-w-none truncate">
-                        {formData.installments}x no cartão
-                      </Badge>
-                    )}
-                  </div>
+                  {/* 3) Chip PIX apenas */}
+                  {isPix && (
+                    <div className="flex flex-wrap items-center justify-center gap-2 min-w-0 py-1">
+                      <span className="md:hidden">
+                        <Badge className="bg-brand/10 text-brand border-brand/20 text-[11px] px-3 py-1.5">
+                          PIX • 0% taxa
+                        </Badge>
+                      </span>
+                      <span className="hidden md:inline">
+                        <Badge className="bg-brand/10 text-brand border-brand/20 text-[11px] px-3 py-1.5">
+                          PIX • 0% taxa • Acesso imediato
+                        </Badge>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* 4) Descritivo de parcelas para Cartão */}
+                  {!isPix && (
+                    <div className="text-center py-1">
+                      <p className="text-xs text-text-primary font-medium leading-tight line-clamp-1 break-words min-w-0">
+                        {getInstallmentLabel()}
+                      </p>
+                    </div>
+                  )}
                 </div>
-
-                {/* Linha 3: Benefício compacto PIX */}
-                {isPix && getPixBenefitText() && (
-                  <div className="flex items-start space-x-1 mt-1">
-                    <Check className="h-3 w-3 text-success flex-shrink-0 mt-0.5" />
-                    <span className="text-xs md:text-sm text-success font-medium leading-tight max-w-[60%] sm:max-w-none truncate">
-                      {getPixBenefitText()}
-                    </span>
-                  </div>
-                )}
-
-                {/* Linha 3: Descritivo de parcelas para Cartão */}
-                {!isPix && (
-                  <div className="flex items-start space-x-1 mt-1">
-                    <CreditCard className="h-3 w-3 text-text-secondary flex-shrink-0 mt-0.5" />
-                    <span className="text-xs md:text-sm text-text-primary font-medium leading-tight max-w-[60%] sm:max-w-none truncate">
-                      {getInstallmentLabel()}
-                    </span>
-                  </div>
-                )}
               </div>
             </Button>
           </CollapsibleTrigger>
