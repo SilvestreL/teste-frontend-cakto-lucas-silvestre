@@ -1,72 +1,70 @@
-# Demonstração de Checkout - Next.js
+# Teste Front-End Cakto - Lucas Silvestre
 
-Este projeto é uma demonstração de funcionalidade de checkout desenvolvida em Next.js, focada especificamente na avaliação técnica de implementação de fluxo de pagamento.
+## Decisões Técnicas
 
-## 🎯 Objetivo
+Optei por uma arquitetura baseada em Next.js 14 com App Router para aproveitar as funcionalidades modernas de React Server Components e streaming. A escolha do TypeScript garante type safety e melhor experiência de desenvolvimento, enquanto o Tailwind CSS oferece estilização eficiente e responsiva. Implementei uma estrutura modular com separação clara entre componentes de UI reutilizáveis (`components/ui/`) e features específicas (`features/checkout/`), facilitando manutenção e escalabilidade.
 
-Demonstrar um fluxo completo de checkout com:
+Para o gerenciamento de estado, utilizei Zustand por sua simplicidade e performance superior ao Redux para este caso de uso. A validação de formulários foi implementada com React Hook Form + Zod, proporcionando validação robusta tanto no cliente quanto no servidor. O sistema de pricing foi desenvolvido com uma arquitetura flexível que permite fácil adição de novas regras de cálculo e métodos de pagamento, seguindo princípios SOLID e design patterns como Strategy.
 
-- Formulário de dados pessoais (email, CPF)
-- Seleção de método de pagamento (PIX e Cartão de Crédito)
-- Cálculo de taxas e parcelamento
-- Tela de confirmação de pedido
-- Simulação de processamento de pagamento
+A containerização com Docker foi implementada para facilitar a execução do projeto, eliminando a necessidade de instalação local de dependências. Isso garante que qualquer pessoa possa executar a aplicação com um simples comando, melhorando significativamente a experiência de avaliação e deploy.
 
-## 🚀 Como Executar
+## Como Executar
 
-### Pré-requisitos
+### Opção 1: Docker (Recomendado)
 
-- Node.js 18+
-- pnpm (recomendado) ou npm
-- Docker e Docker Compose (para containerização)
+```bash
+# Clonar o repositório
+git clone https://github.com/seu-usuario/teste-frontend-cakto-Lucas-Silvestre.git
+cd teste-frontend-cakto-Lucas-Silvestre
 
-### Instalação e Execução
+# Executar com Docker
+./docker-scripts.sh start
+```
 
-#### Opção 1: Execução Local (Desenvolvimento)
+### Opção 2: Local
 
 ```bash
 # Instalar dependências
 pnpm install
 
-# Executar em modo desenvolvimento
+# Executar em desenvolvimento
 pnpm dev
-
-# Build para produção
-pnpm build
-
-# Executar versão de produção
-pnpm start
 ```
 
-#### Opção 2: Containerização com Docker (Recomendado)
+A aplicação estará disponível em: `http://localhost:3000`
+
+## Testes
 
 ```bash
-# Iniciar aplicação
-./docker-scripts.sh start
+# Executar todos os testes
+pnpm test
 
-# Parar containers
-./docker-scripts.sh stop
+# Executar testes com coverage
+pnpm test:coverage
 
-# Ver logs
-./docker-scripts.sh logs
-
-# Executar testes no container
+# Executar testes no container Docker
 ./docker-scripts.sh test
 ```
 
-#### Comando Docker Compose Direto
+## Resposta Bônus
 
-```bash
-# Iniciar aplicação
-docker-compose up --build
+**"Se tivesse mais tempo, o que você faria para aumentar a conversão deste checkout?"**
 
-# Parar aplicação
-docker-compose down
-```
+Para aumentar a conversão, implementaria as seguintes otimizações:
 
-O projeto estará disponível em: `http://localhost:3000`
+**1. Elementos de Urgência e Escassez:** Adicionaria um contador regressivo para ofertas limitadas, indicadores de "últimas vagas disponíveis" e badges de "mais vendido" ou "recomendado". Implementaria também notificações de "X pessoas visualizando este produto agora".
 
-### 🐳 Containerização
+**2. Social Proof Avançado:** Criaria uma seção com depoimentos de clientes reais, logos de empresas que usam o produto, contadores de alunos formados e avaliações com estrelas. Adicionaria também uma seção de "Últimas compras" mostrando transações recentes (com dados anonimizados).
+
+**3. Garantias e Redução de Risco:** Implementaria badges de "Garantia de 30 dias", "Suporte 24/7", "Certificado de conclusão" e "Acesso vitalício". Adicionaria também uma seção de FAQ destacando objeções comuns e suas respostas.
+
+**4. Otimização de UX:** Criaria um processo de checkout em etapas (steps) com progress bar, salvamento automático do progresso, opções de pagamento mais visíveis (especialmente PIX com QR Code), e um resumo mais detalhado com benefícios do produto.
+
+**5. Personalização e Segmentação:** Implementaria diferentes versões do checkout baseadas no perfil do usuário, ofertas personalizadas baseadas em comportamento, e testes A/B para diferentes layouts e copywriting.
+
+---
+
+## 🐳 Containerização
 
 Este projeto inclui configuração simples de Docker para facilitar a execução:
 
@@ -74,16 +72,7 @@ Este projeto inclui configuração simples de Docker para facilitar a execução
 - **docker-compose.yml**: Orquestração de serviços
 - **Scripts auxiliares**: `docker-scripts.sh` para facilitar o uso
 
-#### Estrutura de Containers
-
-```
-📦 checkoutpage-next/
-├── 🐳 Dockerfile.dev      # Build de desenvolvimento
-├── 🐳 docker-compose.yml  # Orquestração
-└── 🔧 docker-scripts.sh   # Scripts auxiliares
-```
-
-#### Vantagens da Containerização
+### Vantagens da Containerização
 
 - ✅ **Instalação zero**: Não precisa instalar Node.js ou pnpm
 - ✅ **Ambiente isolado**: Não interfere com outras aplicações
@@ -113,7 +102,7 @@ Este projeto inclui configuração simples de Docker para facilitar a execução
 - Código PIX (quando aplicável)
 - Status de processamento
 
-## 🛠️ Decisões Técnicas
+## 🛠️ Decisões Técnicas Detalhadas
 
 ### Arquitetura
 
@@ -198,4 +187,6 @@ pnpm dev          # Desenvolvimento
 pnpm build        # Build de produção
 pnpm start        # Servidor de produção
 pnpm lint         # Verificação de código
+pnpm test         # Executar testes
+pnpm test:coverage # Testes com coverage
 ```
