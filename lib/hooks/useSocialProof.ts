@@ -24,16 +24,18 @@ export function useSocialProof(): SocialProofData {
     // Atualiza os dados a cada 45-75 segundos para simular dinamismo
     const updateInterval = setInterval(() => {
       const variation = Math.floor(Math.random() * 8) - 4; // -4 a +4
-      const newViewers = Math.max(24, Math.min(67, data.viewers + variation));
       
-      setData(prev => ({
-        viewers: newViewers,
-        lastUpdate: "nas últimas horas",
-      }));
+      setData(prev => {
+        const newViewers = Math.max(24, Math.min(67, prev.viewers + variation));
+        return {
+          viewers: newViewers,
+          lastUpdate: "nas últimas horas",
+        };
+      });
     }, Math.random() * 30000 + 45000); // 45-75 segundos
 
     return () => clearInterval(updateInterval);
-  }, [data.viewers]);
+  }, []); // Array de dependências vazio - executa apenas uma vez
 
   return data;
 }
