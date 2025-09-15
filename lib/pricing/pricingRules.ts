@@ -34,7 +34,7 @@ export const PRICING_RULES: PricingConfig = {
     },
     {
       method: "card",
-      baseRate: new Decimal("0.0399"), // 3,99%
+      baseRate: new Decimal("0.0399"), // 3,99% para 1x
       additionalRatePerInstallment: new Decimal("0.02"), // 2% por parcela extra
       minInstallmentValue: new Decimal("5.00"), // R$ 5,00 mínimo por parcela
       maxInstallments: 12,
@@ -49,20 +49,28 @@ export const PRICING_RULES: PricingConfig = {
 
 /**
  * Calcula a taxa de juros baseada no método e parcelas
+ * Regras de negócio:
+ * - PIX: sem taxa
+ * - 1x cartão: valor + 3.99%
+ * - 2x cartão: (valor + 4.99%) / 2 + 2%
+ * - 3x cartão: (valor + 4.99%) / 3 + 4%
+ * - etc.
  */
 export function calculateRate(method: PaymentMethod, installments: number): Decimal {
-  const rule = PRICING_RULES.rules.find((r) => r.method === method);
-  if (!rule) return new Decimal(0);
-
   if (method === "pix") return new Decimal(0);
 
   if (installments === 1) {
-    return rule.baseRate;
+    return new Decimal("0.0399"); // 3.99% para 1x
   }
 
-  return rule.baseRate.plus(
-    rule.additionalRatePerInstallment.mul(installments - 1)
-  );
+  // Para parcelas > 1: taxa base de 4.99% + taxa adicional por parcela
+  // 2x: 4.99% + 2% = 6.99%
+  // 3x: 4.99% + 4% = 8.99%
+  // 4x: 4.99% + 6% = 10.99%
+  const baseRate = new Decimal("0.0499"); // 4.99%
+  const additionalRate = new Decimal("0.02").mul(installments - 1); // 2% por parcela extra
+  
+  return baseRate.plus(additionalRate);
 }
 
 /**
