@@ -18,8 +18,11 @@ Demonstrar um fluxo completo de checkout com:
 
 - Node.js 18+
 - pnpm (recomendado) ou npm
+- Docker e Docker Compose (para containerização)
 
 ### Instalação e Execução
+
+#### Opção 1: Execução Local (Desenvolvimento)
 
 ```bash
 # Instalar dependências
@@ -35,7 +38,57 @@ pnpm build
 pnpm start
 ```
 
+#### Opção 2: Containerização com Docker (Recomendado)
+
+```bash
+# Iniciar aplicação
+./docker-scripts.sh start
+
+# Parar containers
+./docker-scripts.sh stop
+
+# Ver logs
+./docker-scripts.sh logs
+
+# Executar testes no container
+./docker-scripts.sh test
+```
+
+#### Comando Docker Compose Direto
+
+```bash
+# Iniciar aplicação
+docker-compose up --build
+
+# Parar aplicação
+docker-compose down
+```
+
 O projeto estará disponível em: `http://localhost:3000`
+
+### 🐳 Containerização
+
+Este projeto inclui configuração simples de Docker para facilitar a execução:
+
+- **Dockerfile.dev**: Configuração para desenvolvimento
+- **docker-compose.yml**: Orquestração de serviços
+- **Scripts auxiliares**: `docker-scripts.sh` para facilitar o uso
+
+#### Estrutura de Containers
+
+```
+📦 checkoutpage-next/
+├── 🐳 Dockerfile.dev      # Build de desenvolvimento
+├── 🐳 docker-compose.yml  # Orquestração
+└── 🔧 docker-scripts.sh   # Scripts auxiliares
+```
+
+#### Vantagens da Containerização
+
+- ✅ **Instalação zero**: Não precisa instalar Node.js ou pnpm
+- ✅ **Ambiente isolado**: Não interfere com outras aplicações
+- ✅ **Hot reload**: Mudanças no código são refletidas automaticamente
+- ✅ **Comando simples**: Apenas `./docker-scripts.sh start`
 
 ## 📱 Fluxo da Aplicação
 

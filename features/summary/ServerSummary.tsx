@@ -1,0 +1,470 @@
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { MobileProductHeader } from "@/components/mobile/MobileProductHeader";
+import { MobileSummaryCompact } from "@/components/mobile/MobileSummaryCompact";
+import { MobileDetailsAccordion } from "@/components/mobile/MobileDetailsAccordion";
+import type { Product } from "@/types/checkout";
+import { formatBRL, formatPercent } from "@/lib/currency";
+import { getPricing, getFormattedPricing } from "@/lib/pricing";
+import Decimal from "decimal.js";
+import { Zap, TrendingDown, Shield, Clock, CreditCard } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Dynamic import do ClientSummary para lazy loading
+const ClientSummary = dynamic(() => import("./ClientSummary"), {
+  ssr: false,
+  loading: () => (
+    <div className="animate-pulse space-y-3">
+      <div className="h-6 w-28 rounded bg-surface-2 mb-2" />
+      <div className="h-4 w-24 rounded bg-surface-2" />
+    </div>
+  ),
+});
+
+// Dynamic import dos componentes de urgência
+const UrgencyElements = dynamic(
+  () =>
+    import("@/components/urgency/UrgencyElements").then((mod) => ({
+      default: mod.UrgencyElements,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="animate-pulse space-y-2">
+        <div className="h-4 w-32 rounded bg-surface-2 mx-auto" />
+        <div className="h-8 w-24 rounded bg-surface-2 mx-auto" />
+      </div>
+    ),
+  }
+);
+
+const CountdownTimer = dynamic(
+  () =>
+    import("@/components/urgency/CountdownTimer").then((mod) => ({
+      default: mod.CountdownTimer,
+    })),
+  {
+    ssr: false,
+    loading: () => <div className="h-4 w-16 rounded bg-surface-2" />,
+  }
+);
+
+const SocialProof = dynamic(
+  () =>
+    import("@/components/urgency/SocialProof").then((mod) => ({
+      default: mod.SocialProof,
+    })),
+  {
+    ssr: false,
+    loading: () => <div className="h-4 w-20 rounded bg-surface-2" />,
+  }
+);
+
+export const revalidate = 600; // Cache por 10 minutos
+
+interface ServerSummaryProps {
+  product: Product;
+  initialPricing?: {
+    total: number;
+    monthly: number;
+    savings: number;
+    savingsPercent: number;
+    feeAmount: number;
+    netValue: number;
+    pixSavings: number;
+  };
+}
+
+export default function ServerSummary({
+  product,
+  initialPricing,
+}: ServerSummaryProps) {
+  // Se não recebeu pricing inicial, calcula no servidor
+  const pricing =
+    initialPricing ||
+    (() => {
+      // No servidor, sempre usa preço promocional (sem timer)
+      const effectivePrice = product.currentPrice;
+      const pricingResult = getPricing({
+        originalValue: new Decimal(product.originalPrice),
+        currentValue: new Decimal(effectivePrice),
+        paymentMethod: "pix", // Default para cálculo no servidor
+        installments: 1,
+      });
+
+      return {
+        total: pricingResult.total.toNumber(),
+        monthly: pricingResult.monthlyValue.toNumber(),
+        savings: pricingResult.savings.toNumber(),
+        savingsPercent: Number(pricingResult.savingsPercentage.toFixed(0)),
+        feeAmount: pricingResult.feeAmount.toNumber(),
+        netValue: pricingResult.netValue.toNumber(),
+        pixSavings: pricingResult.feeAmount.toNumber(), // PIX não tem taxa
+      };
+    })();
+
+  return (
+    <Card className="p-4 sm:p-6 bg-surface border-border max-w-[420px] lg:max-w-none">
+      <div className="space-y-3">
+        {/* Mobile: Cabeçalho compacto */}
+        <div className="block sm:hidden">
+          <MobileProductHeader
+            product={product}
+            currentPrice={product.currentPrice}
+            paymentMethod="pix" // Default no servidor
+          />
+        </div>
+
+        {/* Desktop: Product Section - SIMPLIFICADO */}
+        <div className="hidden sm:block space-y-4">
+          {/* Imagem compacta */}
+          <div className="relative w-full h-40 rounded-lg bg-surface-2 border border-border overflow-hidden">
+            <img
+              src={product.image || "/placeholder.svg"}
+              alt={product.name}
+              className="w-full h-full object-cover object-center"
+              style={{ objectPosition: "30% 10%" }}
+            />
+          </div>
+
+          <div className="space-y-3">
+            {/* Título principal */}
+            <h3 className="text-lg font-bold text-text-primary leading-tight">
+              {product.name}
+            </h3>
+
+            {/* Descrição limitada a 2 linhas */}
+            {product.description && (
+              <p className="text-sm text-text-secondary leading-relaxed line-clamp-2">
+                {product.description}
+              </p>
+            )}
+
+            {/* Metadados organizados */}
+            <div className="space-y-3">
+              {/* Produtor */}
+              <p className="text-xs text-text-secondary">
+                por{" "}
+                <span className="font-medium text-text-primary">
+                  {product.producer}
+                </span>
+              </p>
+
+              {/* Informações do produto */}
+              <div className="flex flex-wrap gap-2">
+                <Badge
+                  variant="secondary"
+                  className="text-xs px-2.5 py-1 h-auto bg-surface-2 text-text-secondary border-border"
+                >
+                  Produto digital
+                </Badge>
+                <Badge className="text-xs px-2.5 py-1 h-auto bg-brand/10 text-brand border-brand/20">
+                  Liberação imediata
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator className="bg-border/40" />
+
+        {/* Mobile: Resumo compacto + urgência */}
+        <div className="block sm:hidden space-y-3">
+          <MobileSummaryCompact
+            originalPrice={product.originalPrice}
+            currentPrice={product.currentPrice}
+            savings={pricing.savings}
+            savingsPercent={pricing.savingsPercent}
+          />
+
+          {/* Urgência e Social Proof - LAYOUT INTEGRADO MOBILE */}
+          <div className="space-y-3">
+            {/* Texto de urgência */}
+            <div className="text-center">
+              <span className="text-xs text-text-primary">
+                <span className="font-bold">Oferta por tempo limitado!</span>
+              </span>
+            </div>
+
+            {/* Temporizador */}
+            <div className="flex justify-center">
+              <div className="px-3 py-1.5 bg-orange-900/20 border border-orange-600/30 rounded-full">
+                <div className="flex items-center gap-1.5 text-orange-400">
+                  <Clock className="h-3 w-3" />
+                  <CountdownTimer initialMinutes={10} inline={true} />
+                </div>
+              </div>
+            </div>
+
+            {/* Social Proof */}
+            <div className="flex justify-center">
+              <div className="px-3 py-1.5 bg-surface-2 border border-border/30 rounded-full">
+                <SocialProof />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: Pricing Section - NEUTRO */}
+        <div className="hidden sm:block space-y-3">
+          <h4 className="text-base sm:text-lg font-bold text-text-primary">
+            Resumo do pedido
+          </h4>
+
+          {/* Preço + Desconto - BLOCO NEUTRO */}
+          <div className="p-4 sm:p-5 bg-surface-2 border border-border/30 rounded-lg">
+            <div className="space-y-2">
+              {/* Preço original */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-text-secondary">
+                  Preço original
+                </span>
+                <span className="text-sm text-text-secondary line-through">
+                  {formatBRL(product.originalPrice)}
+                </span>
+              </div>
+
+              {/* Desconto aplicado */}
+              {pricing.savings > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-text-secondary">
+                    Desconto aplicado
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-text-primary">
+                      -{formatBRL(pricing.savings)}
+                    </span>
+                    <Badge className="bg-success/10 text-success border-success/20 text-xs px-2 py-1 font-bold">
+                      <TrendingDown className="h-3 w-3 mr-1" />
+                      {pricing.savingsPercent}% OFF
+                    </Badge>
+                  </div>
+                </div>
+              )}
+
+              {/* Preço promocional - REDUZIDO */}
+              <div className="flex items-center justify-between pt-2 border-t border-border/30">
+                <span className="text-sm font-semibold text-text-primary">
+                  Preço promocional
+                </span>
+                <span className="text-2xl font-bold text-text-primary">
+                  {formatBRL(product.currentPrice)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Urgência e Social Proof - DISCRETOS */}
+          <div className="space-y-2">
+            {/* Texto de urgência */}
+            <div className="text-center">
+              <span className="text-sm text-text-primary">
+                <span className="font-bold">Oferta por tempo limitado!</span>
+              </span>
+            </div>
+
+            {/* Temporizador */}
+            <div className="flex justify-center">
+              <div className="px-3 py-1.5 bg-orange-900/15 border border-orange-400/25 rounded-full">
+                <div className="flex items-center gap-2 text-orange-300 text-sm">
+                  <Clock className="h-4 w-4" />
+                  <CountdownTimer initialMinutes={10} inline={true} />
+                </div>
+              </div>
+            </div>
+
+            {/* Social Proof */}
+            <div className="flex justify-center">
+              <div className="px-3 py-1.5 bg-surface-2 border border-border/30 rounded-full">
+                <div className="text-sm text-text-secondary">
+                  <SocialProof />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator className="bg-border/40" />
+
+        {/* Mobile: Detalhes em accordion */}
+        <div className="block sm:hidden">
+          <MobileDetailsAccordion title="Detalhes do pagamento">
+            <div className="space-y-1">
+              {/* Bloco PIX - Vantagens */}
+              <div
+                className="p-2.5 bg-surface-2/50 border border-border/30 rounded-lg mb-3"
+                aria-label="Vantagens do pagamento via PIX"
+              >
+                <div className="space-y-2">
+                  {/* Valor original */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-text-secondary">
+                      Valor original
+                    </span>
+                    <span className="text-xs text-text-secondary line-through">
+                      {formatBRL(product.originalPrice)}
+                    </span>
+                  </div>
+
+                  {/* Valor com desconto */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-text-primary">
+                      Valor com desconto
+                    </span>
+                    <span className="text-sm font-bold text-text-primary">
+                      {formatBRL(product.currentPrice)}
+                    </span>
+                  </div>
+
+                  {/* Vantagem do PIX */}
+                  <div className="pt-2 border-t border-border/20">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-text-secondary">
+                        Vantagem do PIX
+                      </span>
+                      <Badge className="bg-brand/10 text-brand border-brand/20 text-xs px-1.5 py-0.5">
+                        0% taxa • Acesso imediato
+                      </Badge>
+                    </div>
+                    <div className="text-xs text-text-secondary">
+                      Economia no PIX vs cartão 1x: +
+                      {formatBRL(pricing.pixSavings)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 1. Forma de pagamento */}
+              <div className="flex items-center justify-between h-8">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-3 w-3 text-text-secondary opacity-60" />
+                  <span className="text-xs text-text-secondary">
+                    Forma de pagamento
+                  </span>
+                </div>
+                <span className="text-xs text-text-primary">PIX</span>
+              </div>
+            </div>
+          </MobileDetailsAccordion>
+        </div>
+
+        {/* Desktop: Payment Details Section - NEUTRO */}
+        <div className="hidden sm:block">
+          <div className="p-4 bg-surface-2/50 border border-border/30 rounded-lg">
+            <h5 className="text-base sm:text-lg font-bold text-text-primary mb-3">
+              Detalhes do pagamento
+            </h5>
+
+            <div className="space-y-1">
+              {/* Bloco PIX - Vantagens */}
+              <div
+                className="p-3 bg-surface-2/50 border border-border/30 rounded-lg mb-3"
+                aria-label="Vantagens do pagamento via PIX"
+              >
+                <div className="space-y-2">
+                  {/* Valor original */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-secondary">
+                      Valor original
+                    </span>
+                    <span className="text-sm text-text-secondary line-through">
+                      {formatBRL(product.originalPrice)}
+                    </span>
+                  </div>
+
+                  {/* Valor com desconto */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-text-primary">
+                      Valor com desconto
+                    </span>
+                    <span className="text-lg font-bold text-text-primary">
+                      {formatBRL(product.currentPrice)}
+                    </span>
+                  </div>
+
+                  {/* Vantagem do PIX */}
+                  <div className="pt-2 border-t border-border/20">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-text-secondary">
+                        Vantagem do PIX
+                      </span>
+                      <Badge className="bg-brand/10 text-brand border-brand/20 text-xs px-2 py-1">
+                        0% taxa • Acesso imediato
+                      </Badge>
+                    </div>
+                    <div className="text-xs text-text-secondary">
+                      Economia no PIX vs cartão 1x: +
+                      {formatBRL(pricing.pixSavings)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 1. Forma de pagamento */}
+              <div className="flex items-center justify-between h-10">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-text-secondary opacity-60" />
+                  <span className="text-sm text-text-secondary">
+                    Forma de pagamento
+                  </span>
+                </div>
+                <span className="text-sm text-text-primary">PIX</span>
+              </div>
+
+              {/* 2. Valor bruto */}
+              <div className="flex items-center justify-between h-10">
+                <span className="text-sm text-text-secondary">Valor bruto</span>
+                <span className="text-sm text-text-primary">
+                  {formatBRL(product.currentPrice)}
+                </span>
+              </div>
+
+              {/* 3. Valor líquido para o produtor */}
+              <div className="flex items-center justify-between h-10">
+                <span className="text-sm text-text-secondary">
+                  Valor líquido para o produtor
+                </span>
+                <span className="text-sm font-medium text-text-primary">
+                  {formatBRL(pricing.netValue)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator className="bg-border/40" />
+
+        {/* Mobile: Total compacto - REDUZIDO */}
+        <div className="block sm:hidden">
+          <div className="p-3 bg-surface-2/60 border border-border/30 rounded-lg">
+            <div className="text-center space-y-2">
+              <div className="text-xs text-text-secondary">Total a pagar</div>
+              <div className="text-xl font-bold text-text-primary">
+                {formatBRL(pricing.total)}
+              </div>
+              <div className="text-xs text-text-secondary">PIX • 0% taxa</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: Total Section - REDUZIDO */}
+        <div className="hidden sm:block">
+          <div className="p-4 bg-surface-2/60 border border-border/30 rounded-lg">
+            <div className="text-center space-y-2">
+              <div className="text-xs sm:text-sm text-text-secondary">
+                Você paga hoje
+              </div>
+              <div className="text-2xl md:text-3xl font-bold text-text-primary">
+                {formatBRL(pricing.total)}
+              </div>
+              <div className="text-xs sm:text-sm text-text-secondary">
+                (PIX • 0% taxa • Acesso imediato)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}

@@ -1,50 +1,67 @@
-"use client";
-import { useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Container } from "@/components/layout/Container";
-import { CheckoutForm } from "@/features/checkout/CheckoutForm";
-import { Summary } from "@/features/checkout/Summary";
-import { MobileSummary } from "@/features/checkout/MobileSummary";
-import type { CheckoutInput } from "@/types/checkout";
-import { defaultProduct, generateMockOrderId } from "@/mocks";
-import { saveOrder } from "@/mocks/orders";
 import { CactusIcon } from "@/components/ui/cactus-icon";
-import { useCheckoutStore } from "@/lib/state/checkoutStore";
-import { CheckoutStateHydrator } from "@/features/checkout/CheckoutStateHydrator";
+import { getProductWithPricing } from "@/lib/server/data";
+import { MobileSummary } from "@/features/checkout/MobileSummary";
+import ProductHero from "@/features/product/ProductHero";
+import ServerSummary from "@/features/summary/ServerSummary";
+import InteractiveSummary from "@/features/summary/InteractiveSummary";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 
-export default function CheckoutPage() {
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+// Dynamic imports para componentes client
+const CheckoutFormClient = dynamic(
+  () =>
+    import("@/features/checkout/CheckoutFormClient").then((mod) => ({
+      default: mod.default,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-6">
+        <div className="rounded-lg border border-border p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 w-48 bg-surface-2 rounded" />
+            <div className="h-4 w-64 bg-surface-2 rounded" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <div className="h-4 w-12 bg-surface-2 rounded" />
+                <div className="h-12 w-full bg-surface-2 rounded" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 w-12 bg-surface-2 rounded" />
+                <div className="h-12 w-full bg-surface-2 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 w-48 bg-surface-2 rounded" />
+            <div className="h-4 w-64 bg-surface-2 rounded" />
+            <div className="h-32 w-full bg-surface-2 rounded" />
+          </div>
+        </div>
+      </div>
+    ),
+  }
+);
 
-  const handleSubmit = useCallback(
-    async (formData: CheckoutInput) => {
-      if (isSubmitting) return; // Prevent double submission
+const CheckoutStateHydrator = dynamic(
+  () =>
+    import("@/features/checkout/CheckoutStateHydrator").then((mod) => ({
+      default: mod.CheckoutStateHydrator,
+    })),
+  {
+    ssr: false,
+  }
+);
 
-      setIsSubmitting(true);
+export const revalidate = 600; // Cache por 10 minutos
 
-      // Minimum delay to show loading (800-1200ms)
-      const minDelay = new Promise((resolve) => setTimeout(resolve, 900));
-
-      // Simulate API call (always successful for frontend testing)
-      const apiCall = new Promise((resolve) => {
-        setTimeout(() => {
-          resolve("success");
-        }, 1500);
-      });
-
-      // Wait for both minimum delay and API call
-      await Promise.all([minDelay, apiCall]);
-
-      // Generate mock order ID
-      const orderId = generateMockOrderId();
-
-      // Save order data to mock database
-      saveOrder(orderId, formData);
-
-      // Redirect to success page with only order ID
-      router.push(`/success?id=${orderId}`);
-    },
-    [router, isSubmitting]
+export default async function CheckoutPage() {
+  // Busca dados do produto no servidor
+  const { product, pricing } = await getProductWithPricing(
+    "curso-marketing-digital"
   );
 
   return (
@@ -69,7 +86,7 @@ export default function CheckoutPage() {
       </div>
 
       <div className="lg:hidden">
-        <MobileSummary product={defaultProduct} />
+        <MobileSummary product={product} />
       </div>
 
       {/* Main Content */}
@@ -82,16 +99,37 @@ export default function CheckoutPage() {
               </h1>
             </div>
 
-            <CheckoutForm
-              product={defaultProduct}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
+            <Suspense
+              fallback={
+                <div className="space-y-6">
+                  <div className="rounded-lg border border-border p-6">
+                    <div className="animate-pulse space-y-4">
+                      <div className="h-6 w-48 bg-surface-2 rounded" />
+                      <div className="h-4 w-64 bg-surface-2 rounded" />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <div className="h-4 w-12 bg-surface-2 rounded" />
+                          <div className="h-12 w-full bg-surface-2 rounded" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="h-4 w-12 bg-surface-2 rounded" />
+                          <div className="h-12 w-full bg-surface-2 rounded" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            >
+              <CheckoutFormClient product={product} />
+            </Suspense>
           </div>
 
           <div className="hidden lg:block lg:col-span-2">
-            <div className="sticky top-24">
-              <Summary product={defaultProduct} />
+            <div className="sticky top-24 space-y-6">
+              <ProductHero product={product} />
+              <ServerSummary product={product} initialPricing={pricing} />
+              <InteractiveSummary product={product} />
             </div>
           </div>
         </div>
