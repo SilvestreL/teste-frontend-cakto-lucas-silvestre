@@ -173,17 +173,14 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                       Preço promocional
                     </span>
                     <span className="text-text-primary font-semibold">
-                      {formatBRL(product.currentPrice)}
+                      {formatBRL(effectivePrice)}
                     </span>
                   </div>
                   {savings > 0 && (
-                    <div className="flex items-center justify-between text-sm p-2 rounded bg-brand/10 border border-brand/20">
-                      <div className="flex items-center space-x-1">
-                        <TrendingDown className="h-3 w-3 text-brand" />
-                        <span className="text-brand font-medium">Economia</span>
-                      </div>
-                      <span className="text-brand font-semibold">
-                        {formatBRL(savings)}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-success">Economia</span>
+                      <span className="text-success font-medium">
+                        -{formatBRL(savings)}
                       </span>
                     </div>
                   )}
@@ -191,43 +188,79 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
 
                 <div className="border-t border-border/40 pt-2 space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-secondary">
-                      Método de pagamento
-                    </span>
-                    <span className="text-text-primary font-medium">
-                      {formData.paymentMethod === "pix"
-                        ? "PIX"
-                        : "Cartão de crédito"}
-                    </span>
+                    <span className="text-text-secondary">Forma de pagamento</span>
+                    <div className="flex items-center space-x-1">
+                      {formData.paymentMethod === "pix" ? (
+                        <>
+                          <Zap className="h-3 w-3 text-brand" />
+                          <span className="text-text-primary font-medium">PIX</span>
+                          <Badge className="bg-brand/10 text-brand border-brand/20 text-[9px] px-1.5 py-0.5">
+                            0% taxa
+                          </Badge>
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-3 w-3 text-text-primary" />
+                          <span className="text-text-primary font-medium">Cartão</span>
+                          <Badge className="bg-surface-2 text-text-secondary border-border text-[9px] px-1.5 py-0.5">
+                            {formData.installments}x
+                          </Badge>
+                        </>
+                      )}
+                    </div>
                   </div>
 
-                  {feeAmount > 0 && (
+                  {/* Resumo financeiro */}
+                  <div className="space-y-2 pt-2 border-t border-border/40">
+                    <div className="text-xs text-text-secondary font-medium">
+                      Resumo financeiro
+                    </div>
+                    
+                    {/* Valor bruto */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-secondary">
-                        Taxa do cartão
-                      </span>
+                      <span className="text-text-secondary">Valor bruto</span>
                       <span className="text-text-primary">
-                        + {formatBRL(feeAmount)}
+                        {formatBRL(effectivePrice)}
                       </span>
                     </div>
-                  )}
 
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-secondary">Produtor recebe</span>
-                    <span className="text-text-primary font-medium">
-                      {formatBRL(netValue)}
-                    </span>
+                    {/* Taxa da plataforma */}
+                    {feeAmount > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-text-secondary">Taxa da plataforma</span>
+                        <span className="text-text-primary">
+                          +{formatBRL(feeAmount)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Valor líquido para o produtor */}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-text-secondary">Valor líquido para o produtor</span>
+                      <span className="text-text-primary font-medium">
+                        {formatBRL(netValue)}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="border-t border-border/40 pt-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-text-primary">
-                      Total a pagar
-                    </span>
-                    <span className="font-bold text-lg text-text-primary">
+                {/* Total a pagar - DESTAQUE */}
+                <div className="pt-3 border-t border-border/40">
+                  <div className="text-center">
+                    <div className="text-xs text-text-secondary mb-1">Total a pagar</div>
+                    <div className="text-2xl font-bold text-text-primary">
                       {formatBRL(total)}
-                    </span>
+                    </div>
+                    {formData.paymentMethod === "pix" && (
+                      <div className="text-xs text-text-secondary mt-1">
+                        PIX • 0% taxa • Acesso imediato
+                      </div>
+                    )}
+                    {formData.paymentMethod === "card" && formData.installments > 1 && (
+                      <div className="text-xs text-text-secondary mt-1">
+                        {formData.installments}x de {formatBRL(pricing.monthlyValue.toNumber())}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

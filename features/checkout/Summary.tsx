@@ -442,11 +442,19 @@ export function Summary({ product, formData }: SummaryProps) {
                   </div>
                 )}
 
-              {/* 3. Taxa do cartão (apenas se feeAmount > 0) */}
-              {formData.paymentMethod === "card" && feeAmount > 0 && (
+              {/* 3. Valor bruto */}
+              <div className="flex items-center justify-between h-10">
+                <span className="text-sm text-text-secondary">Valor bruto</span>
+                <span className="text-sm text-text-primary">
+                  {formatBRL(effectivePrice)}
+                </span>
+              </div>
+
+              {/* 4. Taxa da plataforma (apenas se feeAmount > 0) */}
+              {feeAmount > 0 && (
                 <div className="flex items-center justify-between h-10">
                   <span className="text-sm text-text-secondary">
-                    Taxa do cartão
+                    Taxa da plataforma
                   </span>
                   <span className="text-sm font-medium text-amber-400">
                     +{formatBRL(feeAmount)} ({feePercent}%
@@ -457,6 +465,16 @@ export function Summary({ product, formData }: SummaryProps) {
                   </span>
                 </div>
               )}
+
+              {/* 5. Valor líquido para o produtor */}
+              <div className="flex items-center justify-between h-10">
+                <span className="text-sm text-text-secondary">
+                  Valor líquido para o produtor
+                </span>
+                <span className="text-sm font-medium text-text-primary">
+                  {formatBRL(netValue)}
+                </span>
+              </div>
             </div>
           </div>
         </div>
