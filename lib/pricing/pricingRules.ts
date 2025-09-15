@@ -134,7 +134,7 @@ export function calculateNetValue(originalValue: Decimal, total: Decimal): Decim
 /**
  * Gera opções de parcelamento com cálculos precisos
  */
-export function generateInstallmentOptions(originalValue: Decimal): Array<{
+export type InstallmentOption = {
   value: number;
   label: string;
   rate: Decimal;
@@ -142,8 +142,18 @@ export function generateInstallmentOptions(originalValue: Decimal): Array<{
   lastValue: Decimal;
   total: Decimal;
   adjustedTotal: Decimal;
-}> {
-  const options = [];
+};
+
+export function generateInstallmentOptions(originalValue: Decimal): InstallmentOption[] {
+  const options: Array<{
+    value: number;
+    label: string;
+    rate: Decimal;
+    monthlyValue: Decimal;
+    lastValue: Decimal;
+    total: Decimal;
+    adjustedTotal: Decimal;
+  }> = [];
   const cardRule = PRICING_RULES.rules.find((r) => r.method === "card");
   
   if (!cardRule) return options;

@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,14 @@ import { maskCPF, isValidCPF } from "@/lib/cpf";
 import { useCountdown } from "@/lib/hooks/useCountdown";
 import { Shield, Zap, Loader2 } from "lucide-react";
 import { PaymentLoadingOverlay } from "@/components/ui/payment-loading-overlay";
+import {
+  useCheckoutStore,
+  selEmail,
+  selCpf,
+  selPM,
+  selInst,
+  selSetters,
+} from "@/lib/state/checkoutStore";
 
 const checkoutSchema = z.object({
   email: z.string().min(1, "Email é obrigatório").email("Email inválido"),
@@ -32,80 +40,114 @@ const checkoutSchema = z.object({
 });
 
 interface CheckoutFormProps {
-  data: CheckoutInput;
   product: Product;
-  onChange: (data: Partial<CheckoutInput>) => void;
-  onSubmit: (data: CheckoutInput) => void;
+  onSubmit: (formData: CheckoutInput) => void;
   isSubmitting: boolean;
 }
 
 export function CheckoutForm({
-  data,
   product,
-  onChange,
   onSubmit,
   isSubmitting,
 }: CheckoutFormProps) {
-  const [cpfValue, setCpfValue] = useState(maskCPF(data.cpf || ""));
-  const isInitialRender = useRef(true);
+  // React Hook Form como source of truth
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    reset,
+    control,
+  } = useForm<CheckoutInput>({
+    resolver: zodResolver(checkoutSchema),
+    defaultValues: {
+      email: "",
+      cpf: "",
+      paymentMethod: "pix",
+      installments: 1,
+    },
+    mode: "onChange", // Validação em tempo real
+  });
+
+  // Seletores primitivos do Zustand para persistência
+  const setEmail = useCheckoutStore((s) => s.setEmail);
+  const setCpf = useCheckoutStore((s) => s.setCpf);
+  const setPaymentMethod = useCheckoutStore((s) => s.setPaymentMethod);
+  const setInstallments = useCheckoutStore((s) => s.setInstallments);
+
+  const [cpfValue, setCpfValue] = useState("");
   const { isExpired } = useCountdown(10); // 10 minutos de desconto
+  const isInitialized = useRef(false);
 
   // Usa preço promocional se o timer não expirou, senão usa preço original
   const effectivePrice = isExpired
     ? product.originalPrice
     : product.currentPrice;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    setValue,
-    watch,
-  } = useForm<CheckoutInput>({
-    resolver: zodResolver(checkoutSchema),
-    defaultValues: data,
-    mode: "onChange",
-  });
+  // Watch form values para usar no submit
+  const watchedEmail = useWatch({ control, name: "email" });
+  const watchedCpf = useWatch({ control, name: "cpf" });
+  const watchedPaymentMethod = useWatch({ control, name: "paymentMethod" });
+  const watchedInstallments = useWatch({ control, name: "installments" });
 
-  const email = watch("email");
-  const cpf = watch("cpf");
-  const paymentMethod = watch("paymentMethod");
-  const installments = watch("installments");
-
-  const formData = useCallback(
-    () => ({
-      email,
-      cpf,
-      paymentMethod,
-      installments,
-    }),
-    [email, cpf, paymentMethod, installments]
-  );
-
+  // Hidratação única na montagem (sem dependências problemáticas)
   useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      return;
-    }
-    onChange(formData());
-  }, [email, cpf, paymentMethod, installments, onChange, formData]);
+    if (isInitialized.current) return;
+
+    // Valores padrão para hidratação
+    reset({
+      email: "lucas.silvestre@gmail.com",
+      cpf: "07822816489",
+      paymentMethod: "pix",
+      installments: 1,
+    });
+    setCpfValue(maskCPF("07822816489"));
+    isInitialized.current = true;
+  }, [reset]);
 
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const masked = maskCPF(e.target.value);
     setCpfValue(masked);
-    setValue("cpf", masked.replace(/\D/g, ""));
+    const unmaskedCPF = masked.replace(/\D/g, "");
+    setValue("cpf", unmaskedCPF, { shouldValidate: true });
+    // Sincronizar com Zustand apenas quando necessário
+    setCpf(unmaskedCPF);
   };
 
   const handlePaymentMethodChange = (method: "pix" | "card") => {
-    setValue("paymentMethod", method);
+    setValue("paymentMethod", method, { shouldValidate: true });
+    setPaymentMethod(method);
     if (method === "pix") {
-      setValue("installments", 1);
+      setValue("installments", 1, { shouldValidate: true });
+      setInstallments(1);
     }
   };
 
   const handleInstallmentsChange = (installments: number) => {
-    setValue("installments", installments);
+    setValue("installments", installments, { shouldValidate: true });
+    setInstallments(installments);
   };
+
+  const handleFormSubmit = useCallback(() => {
+    if (isValid && !isSubmitting) {
+      // Get current form values
+      const formData = {
+        email: watchedEmail || "",
+        cpf: watchedCpf || "",
+        paymentMethod: watchedPaymentMethod || "pix",
+        installments: watchedInstallments || 1,
+      };
+      onSubmit(formData);
+    }
+  }, [
+    isValid,
+    isSubmitting,
+    onSubmit,
+    watchedEmail,
+    watchedCpf,
+    watchedPaymentMethod,
+    watchedInstallments,
+  ]);
 
   return (
     <div className="space-y-6" aria-busy={isSubmitting}>
@@ -113,26 +155,35 @@ export function CheckoutForm({
         <div className="space-y-6">
           <div>
             <h2 className="text-xl font-semibold text-text-primary mb-2">
-              Dados pessoais
+              Informações pessoais
             </h2>
             <p className="text-sm text-text-secondary">
-              Preencha com seus dados para finalizar a compra
+              Preencha seus dados para finalizar a compra
             </p>
           </div>
 
-          {/* Personal Data Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-text-primary font-medium">
                 Email
               </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                className="bg-surface-2 border-border text-text-primary placeholder:text-muted h-12"
-                {...register("email")}
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setEmail(e.target.value); // Sincronizar com Zustand
+                    }}
+                    className="bg-surface-2 border-border text-text-primary placeholder:text-muted h-12"
+                  />
+                )}
               />
               {errors.email && (
                 <p className="text-sm text-danger flex items-center gap-1">
@@ -177,32 +228,27 @@ export function CheckoutForm({
           </div>
 
           <PaymentOptions
-            selected={paymentMethod}
-            onSelect={handlePaymentMethodChange}
             productValue={effectivePrice}
-            installments={installments}
+            onPaymentMethodChange={handlePaymentMethodChange}
           />
 
           {/* Installments (only for card) */}
-          {paymentMethod === "card" && (
-            <div className="space-y-4 pt-4 border-t border-border">
-              <Label className="text-text-primary font-medium">
-                Parcelamento
-              </Label>
-              <InstallmentsSelect
-                value={installments}
-                onChange={handleInstallmentsChange}
-                productValue={effectivePrice}
-              />
-            </div>
-          )}
+          <div className="space-y-4 pt-4 border-t border-border">
+            <Label className="text-text-primary font-medium">
+              Parcelamento
+            </Label>
+            <InstallmentsSelect
+              productValue={effectivePrice}
+              onChange={handleInstallmentsChange}
+            />
+          </div>
         </div>
       </Card>
 
       <div className="space-y-4">
         <Button
           type="submit"
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleFormSubmit}
           className="w-full bg-brand hover:bg-brand-hover text-brand-foreground py-6 text-lg font-semibold transition-all duration-200 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           disabled={!isValid || isSubmitting}
         >
@@ -213,39 +259,24 @@ export function CheckoutForm({
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              {paymentMethod === "pix" ? (
-                <Zap className="h-5 w-5" />
-              ) : (
-                <Shield className="h-5 w-5" />
-              )}
+              <Shield className="h-5 w-5" />
               Finalizar compra
             </div>
           )}
         </Button>
 
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 text-sm text-text-secondary">
-            <Shield className="h-4 w-4" />
-            <span>Pagamento 100% seguro</span>
-          </div>
-          {paymentMethod === "pix" && (
-            <div className="flex items-center justify-center gap-2 text-sm text-brand">
-              <Zap className="h-4 w-4" />
-              <span>Receba acesso imediato após o pagamento</span>
-            </div>
-          )}
+        <div className="flex items-center gap-2 text-sm text-text-secondary">
+          <Shield className="h-4 w-4" />
+          <span>Pagamento 100% seguro e criptografado</span>
         </div>
       </div>
 
-      {/* Payment Loading Overlay */}
-      <PaymentLoadingOverlay
-        open={isSubmitting}
-        message={
-          paymentMethod === "pix"
-            ? "Gerando e confirmando pagamento PIX…"
-            : "Processando pagamento no cartão…"
-        }
-      />
+      {isSubmitting && (
+        <PaymentLoadingOverlay
+          open={isSubmitting}
+          message="Processando pagamento..."
+        />
+      )}
     </div>
   );
 }

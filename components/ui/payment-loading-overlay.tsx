@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { RiCactusLine } from "react-icons/ri";
+import { CactusIcon } from "@/components/ui/cactus-icon";
 
 interface PaymentLoadingOverlayProps {
   open: boolean;
@@ -51,7 +51,7 @@ export function PaymentLoadingOverlay({
               ease: "easeInOut",
             }}
           >
-            <RiCactusLine className="h-8 w-8" />
+            <CactusIcon className="h-8 w-8" />
           </motion.div>
 
           {/* Mensagem com tipografia consistente */}

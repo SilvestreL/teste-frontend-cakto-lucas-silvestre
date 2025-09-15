@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { CheckoutForm } from "@/features/checkout/CheckoutForm";
@@ -7,24 +7,17 @@ import { Summary } from "@/features/checkout/Summary";
 import { MobileSummary } from "@/features/checkout/MobileSummary";
 import type { CheckoutInput } from "@/types/checkout";
 import { defaultProduct, generateMockOrderId } from "@/mocks";
-import { RiCactusLine } from "react-icons/ri";
+import { saveOrder } from "@/mocks/orders";
+import { CactusIcon } from "@/components/ui/cactus-icon";
+import { useCheckoutStore } from "@/lib/state/checkoutStore";
+import { CheckoutStateHydrator } from "@/features/checkout/CheckoutStateHydrator";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState<CheckoutInput>({
-    email: "lucas.silvestre@gmail.com",
-    cpf: "07822816489",
-    paymentMethod: "pix",
-    installments: 1,
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleFormChange = useCallback((data: Partial<CheckoutInput>) => {
-    setFormData((prev) => ({ ...prev, ...data }));
-  }, []);
-
   const handleSubmit = useCallback(
-    async (data: CheckoutInput) => {
+    async (formData: CheckoutInput) => {
       if (isSubmitting) return; // Prevent double submission
 
       setIsSubmitting(true);
@@ -45,31 +38,27 @@ export default function CheckoutPage() {
       // Generate mock order ID
       const orderId = generateMockOrderId();
 
-      // Encode form data to pass to success page
-      const encodedData = encodeURIComponent(
-        JSON.stringify({
-          email: data.email,
-          cpf: data.cpf,
-          paymentMethod: data.paymentMethod,
-          installments: data.installments,
-        })
-      );
+      // Save order data to mock database
+      saveOrder(orderId, formData);
 
-      // Redirect to success page with order ID and form data
-      router.push(`/success?id=${orderId}&data=${encodedData}`);
+      // Redirect to success page with only order ID
+      router.push(`/success?id=${orderId}`);
     },
     [router, isSubmitting]
   );
 
   return (
     <div className="min-h-screen bg-bg">
+      {/* Hydrator do estado do checkout */}
+      <CheckoutStateHydrator />
+
       {/* Header simples focado no checkout */}
       <div className="border-b border-border bg-bg/95 backdrop-blur sticky top-0 z-50">
         <Container>
           <div className="flex items-center justify-center py-4">
             <div className="flex items-center space-x-3">
               <div className="h-8 w-8 rounded-lg bg-brand flex items-center justify-center">
-                <RiCactusLine className="text-brand-foreground text-lg" />
+                <CactusIcon className="text-brand-foreground text-lg" />
               </div>
               <span className="text-xl font-bold text-text-primary">
                 Demonstração de Checkout
@@ -80,7 +69,7 @@ export default function CheckoutPage() {
       </div>
 
       <div className="lg:hidden">
-        <MobileSummary product={defaultProduct} formData={formData} />
+        <MobileSummary product={defaultProduct} />
       </div>
 
       {/* Main Content */}
@@ -94,9 +83,7 @@ export default function CheckoutPage() {
             </div>
 
             <CheckoutForm
-              data={formData}
               product={defaultProduct}
-              onChange={handleFormChange}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
             />
@@ -104,7 +91,7 @@ export default function CheckoutPage() {
 
           <div className="hidden lg:block lg:col-span-2">
             <div className="sticky top-24">
-              <Summary product={defaultProduct} formData={formData} />
+              <Summary product={defaultProduct} />
             </div>
           </div>
         </div>

@@ -9,7 +9,8 @@ import { MobileProductHeader } from "@/components/mobile/MobileProductHeader";
 import { MobileUrgencyElements } from "@/components/mobile/MobileUrgencyElements";
 import { MobileSummaryCompact } from "@/components/mobile/MobileSummaryCompact";
 import { MobileDetailsAccordion } from "@/components/mobile/MobileDetailsAccordion";
-import type { Product, CheckoutInput } from "@/types/checkout";
+import type { Product } from "@/types/checkout";
+import { useCheckoutStore } from "@/lib/state/checkoutStore";
 import { formatBRL, formatPercent } from "@/lib/currency";
 import { getPricing, getFormattedPricing } from "@/lib/pricing";
 import Decimal from "decimal.js";
@@ -18,10 +19,12 @@ import { Zap, TrendingDown, Shield, Clock, CreditCard } from "lucide-react";
 
 interface SummaryProps {
   product: Product;
-  formData: CheckoutInput;
 }
 
-export function Summary({ product, formData }: SummaryProps) {
+export function Summary({ product }: SummaryProps) {
+  // Usar seletores primitivos para evitar re-renders desnecessários
+  const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
+  const installments = useCheckoutStore((state) => state.installments);
   const { isExpired } = useCountdown(10); // 10 minutos de desconto
 
   // Usa preço promocional se o timer não expirou, senão usa preço original
@@ -33,15 +36,15 @@ export function Summary({ product, formData }: SummaryProps) {
   const pricing = getPricing({
     originalValue: new Decimal(product.originalPrice),
     currentValue: new Decimal(effectivePrice),
-    paymentMethod: formData.paymentMethod,
-    installments: formData.installments,
+    paymentMethod,
+    installments,
   });
 
   const formattedPricing = getFormattedPricing({
     originalValue: new Decimal(product.originalPrice),
     currentValue: new Decimal(effectivePrice),
-    paymentMethod: formData.paymentMethod,
-    installments: formData.installments,
+    paymentMethod,
+    installments,
   });
 
   // Valores para compatibilidade com o código existente
@@ -75,7 +78,7 @@ export function Summary({ product, formData }: SummaryProps) {
           <MobileProductHeader
             product={product}
             currentPrice={effectivePrice}
-            paymentMethod={formData.paymentMethod}
+            paymentMethod={paymentMethod}
           />
         </div>
 
@@ -255,7 +258,7 @@ export function Summary({ product, formData }: SummaryProps) {
           <MobileDetailsAccordion title="Detalhes do pagamento">
             <div className="space-y-1">
               {/* Bloco PIX - Vantagens (apenas quando PIX) */}
-              {formData.paymentMethod === "pix" && (
+              {paymentMethod === "pix" && (
                 <div
                   className="p-2.5 bg-surface-2/50 border border-border/30 rounded-lg mb-3"
                   aria-label="Vantagens do pagamento via PIX"
@@ -302,7 +305,7 @@ export function Summary({ product, formData }: SummaryProps) {
               {/* 1. Forma de pagamento */}
               <div className="flex items-center justify-between h-8">
                 <div className="flex items-center gap-2">
-                  {formData.paymentMethod === "pix" ? (
+                  {paymentMethod === "pix" ? (
                     <Zap className="h-3 w-3 text-text-secondary opacity-60" />
                   ) : (
                     <CreditCard className="h-3 w-3 text-text-secondary opacity-60" />
@@ -312,41 +315,35 @@ export function Summary({ product, formData }: SummaryProps) {
                   </span>
                 </div>
                 <span className="text-xs text-text-primary">
-                  {formData.paymentMethod === "pix"
+                  {paymentMethod === "pix"
                     ? "PIX"
                     : `Cartão de crédito${
-                        formData.installments > 1
-                          ? ` • ${formData.installments}x`
-                          : ""
+                        installments > 1 ? ` • ${installments}x` : ""
                       }`}
                 </span>
               </div>
 
               {/* 2. Parcelamento (apenas se installments > 1) */}
-              {formData.paymentMethod === "card" &&
-                formData.installments > 1 && (
-                  <div className="flex items-center justify-between h-8">
-                    <span className="text-xs text-text-secondary">
-                      Parcelamento
-                    </span>
-                    <span className="text-xs text-text-primary">
-                      {formData.installments}x de {formatBRL(monthlyValue)}
-                    </span>
-                  </div>
-                )}
+              {paymentMethod === "card" && installments > 1 && (
+                <div className="flex items-center justify-between h-8">
+                  <span className="text-xs text-text-secondary">
+                    Parcelamento
+                  </span>
+                  <span className="text-xs text-text-primary">
+                    {installments}x de {formatBRL(monthlyValue)}
+                  </span>
+                </div>
+              )}
 
               {/* 3. Taxa do cartão (apenas se feeAmount > 0) */}
-              {formData.paymentMethod === "card" && feeAmount > 0 && (
+              {paymentMethod === "card" && feeAmount > 0 && (
                 <div className="flex items-center justify-between h-8">
                   <span className="text-xs text-text-secondary">
                     Taxa do cartão
                   </span>
                   <span className="text-xs text-text-primary">
                     +{formatBRL(feeAmount)} ({feePercent}%
-                    {formData.installments > 1
-                      ? ` • ${formData.installments}x`
-                      : ""}
-                    )
+                    {installments > 1 ? ` • ${installments}x` : ""})
                   </span>
                 </div>
               )}
@@ -363,7 +360,7 @@ export function Summary({ product, formData }: SummaryProps) {
 
             <div className="space-y-1">
               {/* Bloco PIX - Vantagens (apenas quando PIX) */}
-              {formData.paymentMethod === "pix" && (
+              {paymentMethod === "pix" && (
                 <div
                   className="p-3 bg-surface-2/50 border border-border/30 rounded-lg mb-3"
                   aria-label="Vantagens do pagamento via PIX"
@@ -410,7 +407,7 @@ export function Summary({ product, formData }: SummaryProps) {
               {/* 1. Forma de pagamento */}
               <div className="flex items-center justify-between h-10">
                 <div className="flex items-center gap-2">
-                  {formData.paymentMethod === "pix" ? (
+                  {paymentMethod === "pix" ? (
                     <Zap className="h-4 w-4 text-text-secondary opacity-60" />
                   ) : (
                     <CreditCard className="h-4 w-4 text-text-secondary opacity-60" />
@@ -420,28 +417,25 @@ export function Summary({ product, formData }: SummaryProps) {
                   </span>
                 </div>
                 <span className="text-sm text-text-primary">
-                  {formData.paymentMethod === "pix"
+                  {paymentMethod === "pix"
                     ? "PIX"
                     : `Cartão de crédito${
-                        formData.installments > 1
-                          ? ` • ${formData.installments}x`
-                          : ""
+                        installments > 1 ? ` • ${installments}x` : ""
                       }`}
                 </span>
               </div>
 
               {/* 2. Parcelamento (apenas se installments > 1) */}
-              {formData.paymentMethod === "card" &&
-                formData.installments > 1 && (
-                  <div className="flex items-center justify-between h-10">
-                    <span className="text-sm text-text-secondary">
-                      Parcelamento
-                    </span>
-                    <span className="text-sm text-text-primary">
-                      {formData.installments}x de {formatBRL(monthlyValue)}
-                    </span>
-                  </div>
-                )}
+              {paymentMethod === "card" && installments > 1 && (
+                <div className="flex items-center justify-between h-10">
+                  <span className="text-sm text-text-secondary">
+                    Parcelamento
+                  </span>
+                  <span className="text-sm text-text-primary">
+                    {installments}x de {formatBRL(monthlyValue)}
+                  </span>
+                </div>
+              )}
 
               {/* 3. Valor bruto */}
               <div className="flex items-center justify-between h-10">
@@ -459,10 +453,7 @@ export function Summary({ product, formData }: SummaryProps) {
                   </span>
                   <span className="text-sm font-medium text-amber-400">
                     +{formatBRL(feeAmount)} ({feePercent}%
-                    {formData.installments > 1
-                      ? ` • ${formData.installments}x`
-                      : ""}
-                    )
+                    {installments > 1 ? ` • ${installments}x` : ""})
                   </span>
                 </div>
               )}
@@ -490,13 +481,12 @@ export function Summary({ product, formData }: SummaryProps) {
               <div className="text-xl font-bold text-text-primary">
                 {formatBRL(total)}
               </div>
-              {formData.paymentMethod === "card" &&
-                formData.installments > 1 && (
-                  <div className="text-xs text-text-secondary">
-                    {formData.installments}x de {formatBRL(monthlyValue)}
-                  </div>
-                )}
-              {formData.paymentMethod === "pix" && (
+              {paymentMethod === "card" && installments > 1 && (
+                <div className="text-xs text-text-secondary">
+                  {installments}x de {formatBRL(monthlyValue)}
+                </div>
+              )}
+              {paymentMethod === "pix" && (
                 <div className="text-xs text-text-secondary">PIX • 0% taxa</div>
               )}
             </div>
@@ -513,14 +503,12 @@ export function Summary({ product, formData }: SummaryProps) {
               <div className="text-2xl md:text-3xl font-bold text-text-primary">
                 {formatBRL(total)}
               </div>
-              {formData.paymentMethod === "card" &&
-                formData.installments > 1 && (
-                  <div className="text-xs sm:text-sm text-text-secondary">
-                    ({formData.installments}x de {formatBRL(monthlyValue)} no
-                    cartão)
-                  </div>
-                )}
-              {formData.paymentMethod === "pix" && (
+              {paymentMethod === "card" && installments > 1 && (
+                <div className="text-xs sm:text-sm text-text-secondary">
+                  ({installments}x de {formatBRL(monthlyValue)} no cartão)
+                </div>
+              )}
+              {paymentMethod === "pix" && (
                 <div className="text-xs sm:text-sm text-text-secondary">
                   (PIX • 0% taxa • Acesso imediato)
                 </div>

@@ -1,52 +1,51 @@
-"use client";
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { SuccessState } from "@/features/checkout/SuccessState";
+import { redirect } from "next/navigation";
 
-function SuccessContent() {
-  const searchParams = useSearchParams();
-  const orderId = searchParams.get("id");
-  const encodedData = searchParams.get("data");
+// Força renderização dinâmica para SSR sem cache
+export const dynamic = "force-dynamic";
 
-  if (!orderId) {
-    return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <Container>
-          <div className="text-center space-y-4">
-            <h1 className="text-h1 text-text-primary">Pedido não encontrado</h1>
-            <p className="text-text-secondary">
-              ID do pedido não foi fornecido ou é inválido.
-            </p>
-          </div>
-        </Container>
-      </div>
-    );
-  }
-
-  // Parse form data if available
-  let formData = null;
-  if (encodedData) {
-    try {
-      formData = JSON.parse(decodeURIComponent(encodedData));
-    } catch (error) {
-      console.error("Erro ao decodificar dados do formulário:", error);
-    }
-  }
-
-  return <SuccessState orderId={orderId} formData={formData} />;
+interface SuccessPageProps {
+  searchParams: {
+    id?: string;
+  };
 }
 
-export default function SuccessPage() {
+// Função para gerar dados mock baseados no ID
+function generateMockOrderData(orderId: string) {
+  // Simular dados baseados no ID para qualquer pedido
+  const isPix = Math.random() > 0.5; // 50% chance de ser PIX
+  const installments = isPix ? 1 : Math.floor(Math.random() * 3) + 1; // 1-3 parcelas para cartão
+
+  return {
+    formData: {
+      email: `cliente-${orderId.slice(-6)}@exemplo.com`,
+      cpf: "12345678901",
+      paymentMethod: isPix ? ("pix" as const) : ("card" as const),
+      installments: installments,
+    },
+  };
+}
+
+export default function SuccessPage({ searchParams }: SuccessPageProps) {
+  const orderId = searchParams.id;
+
+  // Validar se o ID foi fornecido
+  if (!orderId) {
+    // Redirecionar para a página inicial se não houver ID
+    redirect("/");
+  }
+
+  // Gerar dados mock para qualquer ID (bambiarra para teste)
+  const order = generateMockOrderData(orderId);
+
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-bg flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
+    <div className="min-h-screen bg-bg">
+      <Container className="py-8">
+        <div className="max-w-2xl mx-auto">
+          <SuccessState orderId={orderId} formData={order.formData} />
         </div>
-      }
-    >
-      <SuccessContent />
-    </Suspense>
+      </Container>
+    </div>
   );
 }

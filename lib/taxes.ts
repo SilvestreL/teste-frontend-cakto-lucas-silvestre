@@ -10,7 +10,18 @@ import {
 } from "./pricing";
 
 // Re-export types for backward compatibility
-export type { PaymentMethod, InstallmentOption };
+export type { PaymentMethod };
+
+// Legacy type for backward compatibility (with numbers instead of Decimals)
+export type LegacyInstallmentOption = {
+  value: number;
+  label: string;
+  rate: number;
+  monthlyValue: number;
+  lastValue: number;
+  total: number;
+  adjustedTotal: number;
+};
 
 /**
  * @deprecated Use calculateRate from ./pricing instead
@@ -52,7 +63,7 @@ export function calcNet(originalValue: number, total: number): number {
  * @deprecated Use generateInstallmentOptions from ./pricing instead
  * Gera opções de parcelamento para cartão
  */
-export function generateInstallmentOptions(value: number): InstallmentOption[] {
+export function generateInstallmentOptions(value: number): LegacyInstallmentOption[] {
   const options = newGenerateInstallmentOptions(new Decimal(value));
   
   return options.map(option => ({
@@ -60,5 +71,8 @@ export function generateInstallmentOptions(value: number): InstallmentOption[] {
     label: option.label,
     rate: option.rate.toNumber(),
     monthlyValue: option.monthlyValue.toNumber(),
+    lastValue: option.lastValue.toNumber(),
+    total: option.total.toNumber(),
+    adjustedTotal: option.adjustedTotal.toNumber(),
   }));
 }

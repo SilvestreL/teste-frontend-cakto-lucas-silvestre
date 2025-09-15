@@ -4,20 +4,19 @@ import { Badge } from "@/components/ui/badge";
 import { QrCode, CreditCard, Zap, Clock } from "lucide-react";
 import { getFormattedPricing } from "@/lib/pricing";
 import Decimal from "decimal.js";
-
+import { useCheckoutStore } from "@/lib/state/checkoutStore";
 interface PaymentOptionsProps {
-  selected: "pix" | "card";
-  onSelect: (method: "pix" | "card") => void;
   productValue: number;
-  installments?: number;
+  onPaymentMethodChange?: (method: "pix" | "card") => void;
 }
 
 export function PaymentOptions({
-  selected,
-  onSelect,
   productValue,
-  installments = 1,
+  onPaymentMethodChange,
 }: PaymentOptionsProps) {
+  // Usar selectors específicos para evitar re-renders desnecessários
+  const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
+  const installments = useCheckoutStore((state) => state.installments);
   // Usa o novo sistema de preços para cálculos precisos
   const pixPricing = getFormattedPricing({
     originalValue: new Decimal(productValue),
@@ -39,15 +38,15 @@ export function PaymentOptions({
         className={`
           p-6 cursor-pointer transition-all duration-200 relative overflow-hidden
           ${
-            selected === "pix"
+            paymentMethod === "pix"
               ? "bg-surface border-2 border-brand shadow-lg ring-2 ring-brand/20"
               : "bg-surface-2 border-border hover:border-brand/50 hover:shadow-md"
           }
         `}
-        onClick={() => onSelect("pix")}
+        onClick={() => onPaymentMethodChange?.("pix")}
       >
         {/* Highlight indicator for selected state */}
-        {selected === "pix" && (
+        {paymentMethod === "pix" && (
           <div className="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-brand">
             <div className="absolute -top-[18px] -right-[2px]">
               <Zap className="h-3 w-3 text-brand-foreground" />
@@ -91,15 +90,15 @@ export function PaymentOptions({
         className={`
           p-6 cursor-pointer transition-all duration-200 relative
           ${
-            selected === "card"
+            paymentMethod === "card"
               ? "bg-surface border-2 border-brand shadow-lg ring-2 ring-brand/20"
               : "bg-surface-2 border-border hover:border-brand/50 hover:shadow-md"
           }
         `}
-        onClick={() => onSelect("card")}
+        onClick={() => onPaymentMethodChange?.("card")}
       >
         {/* Highlight indicator for selected state */}
-        {selected === "card" && (
+        {paymentMethod === "card" && (
           <div className="absolute top-0 right-0 w-0 h-0 border-l-[20px] border-l-transparent border-t-[20px] border-t-brand">
             <div className="absolute -top-[18px] -right-[2px]">
               <CreditCard className="h-3 w-3 text-brand-foreground" />

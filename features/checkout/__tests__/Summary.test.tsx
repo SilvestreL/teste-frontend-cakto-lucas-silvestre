@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { Summary } from "../Summary";
 import type { Product, CheckoutInput } from "@/types/checkout";
+import { useCheckoutStore } from "@/lib/state/checkoutStore";
 
 // Mock do hook useCountdown
 jest.mock("@/lib/hooks/useCountdown", () => ({
@@ -9,6 +10,11 @@ jest.mock("@/lib/hooks/useCountdown", () => ({
     minutes: 5,
     seconds: 30,
   })),
+}));
+
+// Mock do store Zustand
+jest.mock("@/lib/state/checkoutStore", () => ({
+  useCheckoutStore: jest.fn(),
 }));
 
 // Mock dos componentes de UI
@@ -154,6 +160,28 @@ describe("Componente Summary", () => {
         dispatchEvent: jest.fn(),
       })),
     });
+
+    // Mock padrão do store para PIX
+    (useCheckoutStore as jest.Mock).mockImplementation((selector) => {
+      const mockState = {
+        paymentMethod: "pix",
+        installments: 1,
+        customerInfo: {
+          name: "João Silva",
+          email: "joao@email.com",
+          phone: "11999999999",
+          document: "12345678901",
+        },
+        billingAddress: {
+          street: "Rua das Flores, 123",
+          city: "São Paulo",
+          state: "SP",
+          zipCode: "01234567",
+          country: "BR",
+        },
+      };
+      return selector(mockState);
+    });
   });
 
   describe("Layout Desktop", () => {
@@ -215,7 +243,29 @@ describe("Componente Summary", () => {
     });
 
     it("deve exibir detalhes de pagamento corretamente para Cartão 3x", () => {
-      render(<Summary product={mockProduct} formData={mockFormDataCard} />);
+      // Mock store para cartão 3x
+      (useCheckoutStore as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          paymentMethod: "card",
+          installments: 3,
+          customerInfo: {
+            name: "João Silva",
+            email: "joao@email.com",
+            phone: "11999999999",
+            document: "12345678901",
+          },
+          billingAddress: {
+            street: "Rua das Flores, 123",
+            city: "São Paulo",
+            state: "SP",
+            zipCode: "01234567",
+            country: "BR",
+          },
+        };
+        return selector(mockState);
+      });
+
+      render(<Summary product={mockProduct} />);
 
       expect(screen.getAllByText("Forma de pagamento")[0]).toBeInTheDocument();
       expect(
@@ -230,7 +280,7 @@ describe("Componente Summary", () => {
     });
 
     it("deve exibir total corretamente", () => {
-      render(<Summary product={mockProduct} formData={mockFormDataPix} />);
+      render(<Summary product={mockProduct} />);
 
       expect(screen.getByText("Você paga hoje")).toBeInTheDocument();
       expect(screen.getAllByText("R$ 297,00")[0]).toBeInTheDocument();
@@ -240,7 +290,29 @@ describe("Componente Summary", () => {
     });
 
     it("deve exibir total corretamente para Cartão 3x", () => {
-      render(<Summary product={mockProduct} formData={mockFormDataCard} />);
+      // Mock store para cartão 3x
+      (useCheckoutStore as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          paymentMethod: "card",
+          installments: 3,
+          customerInfo: {
+            name: "João Silva",
+            email: "joao@email.com",
+            phone: "11999999999",
+            document: "12345678901",
+          },
+          billingAddress: {
+            street: "Rua das Flores, 123",
+            city: "São Paulo",
+            state: "SP",
+            zipCode: "01234567",
+            country: "BR",
+          },
+        };
+        return selector(mockState);
+      });
+
+      render(<Summary product={mockProduct} />);
 
       expect(screen.getByText("Você paga hoje")).toBeInTheDocument();
       expect(screen.getAllByText("R$ 323,70")[0]).toBeInTheDocument();
@@ -309,9 +381,7 @@ describe("Componente Summary", () => {
 
   describe("Atualizações Dinâmicas", () => {
     it("deve atualizar quando método de pagamento muda de PIX para Cartão", () => {
-      const { rerender } = render(
-        <Summary product={mockProduct} formData={mockFormDataPix} />
-      );
+      const { rerender } = render(<Summary product={mockProduct} />);
 
       // Verifica PIX
       expect(screen.getAllByText("PIX")[0]).toBeInTheDocument();
@@ -319,8 +389,30 @@ describe("Componente Summary", () => {
         screen.getAllByText("0% taxa • Acesso imediato")[0]
       ).toBeInTheDocument();
 
+      // Mock store para cartão 3x
+      (useCheckoutStore as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          paymentMethod: "card",
+          installments: 3,
+          customerInfo: {
+            name: "João Silva",
+            email: "joao@email.com",
+            phone: "11999999999",
+            document: "12345678901",
+          },
+          billingAddress: {
+            street: "Rua das Flores, 123",
+            city: "São Paulo",
+            state: "SP",
+            zipCode: "01234567",
+            country: "BR",
+          },
+        };
+        return selector(mockState);
+      });
+
       // Muda para Cartão
-      rerender(<Summary product={mockProduct} formData={mockFormDataCard} />);
+      rerender(<Summary product={mockProduct} />);
 
       // Verifica Cartão
       expect(
@@ -331,15 +423,35 @@ describe("Componente Summary", () => {
     });
 
     it("deve atualizar total quando método de pagamento muda", () => {
-      const { rerender } = render(
-        <Summary product={mockProduct} formData={mockFormDataPix} />
-      );
+      const { rerender } = render(<Summary product={mockProduct} />);
 
       // Verifica total PIX
       expect(screen.getAllByText("R$ 297,00")[0]).toBeInTheDocument();
 
+      // Mock store para cartão 3x
+      (useCheckoutStore as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          paymentMethod: "card",
+          installments: 3,
+          customerInfo: {
+            name: "João Silva",
+            email: "joao@email.com",
+            phone: "11999999999",
+            document: "12345678901",
+          },
+          billingAddress: {
+            street: "Rua das Flores, 123",
+            city: "São Paulo",
+            state: "SP",
+            zipCode: "01234567",
+            country: "BR",
+          },
+        };
+        return selector(mockState);
+      });
+
       // Muda para Cartão
-      rerender(<Summary product={mockProduct} formData={mockFormDataCard} />);
+      rerender(<Summary product={mockProduct} />);
 
       // Verifica total Cartão
       expect(screen.getAllByText("R$ 323,70")[0]).toBeInTheDocument();
@@ -348,7 +460,7 @@ describe("Componente Summary", () => {
 
   describe("Sem Duplicação", () => {
     it("não deve duplicar informações importantes", () => {
-      render(<Summary product={mockProduct} formData={mockFormDataPix} />);
+      render(<Summary product={mockProduct} />);
 
       // Cada informação importante deve aparecer apenas uma vez
       const totalElements = screen.getAllByText(/R\$ 297,00/);

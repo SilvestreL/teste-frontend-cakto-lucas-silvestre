@@ -8,7 +8,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import type { Product, CheckoutInput } from "@/types/checkout";
+import type { Product } from "@/types/checkout";
+import { useCheckoutStore } from "@/lib/state/checkoutStore";
 import { formatBRL, formatPercent } from "@/lib/currency";
 import { getPricing } from "@/lib/pricing";
 import { useCountdown } from "@/lib/hooks/useCountdown";
@@ -25,10 +26,12 @@ import {
 
 interface MobileSummaryProps {
   product: Product;
-  formData: CheckoutInput;
 }
 
-export function MobileSummary({ product, formData }: MobileSummaryProps) {
+export function MobileSummary({ product }: MobileSummaryProps) {
+  // Usar seletores primitivos para evitar re-renders desnecessários
+  const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
+  const installments = useCheckoutStore((state) => state.installments);
   const [isOpen, setIsOpen] = useState(false);
   const {
     isExpired,
@@ -66,18 +69,18 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
     const pricing = getPricing({
       originalValue: new Decimal(product.originalPrice),
       currentValue: new Decimal(effectivePrice),
-      paymentMethod: formData.paymentMethod,
-      installments: formData.installments,
+      paymentMethod: paymentMethod,
+      installments: installments,
     });
 
     // Calcular total do cartão para comparação (apenas para PIX)
     const cardPricing =
-      formData.paymentMethod === "pix"
+      paymentMethod === "pix"
         ? getPricing({
             originalValue: new Decimal(product.originalPrice),
             currentValue: new Decimal(effectivePrice),
             paymentMethod: "card",
-            installments: formData.installments,
+            installments: installments,
           })
         : null;
 
@@ -99,8 +102,8 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
   }, [
     product.originalPrice,
     product.currentPrice,
-    formData.paymentMethod,
-    formData.installments,
+    paymentMethod,
+    installments,
     isExpired,
   ]);
 
@@ -118,7 +121,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
   } = calculations;
 
   // Regras de visibilidade otimizadas
-  const isPix = formData.paymentMethod === "pix";
+  const isPix = paymentMethod === "pix";
   const shouldShowOriginalPrice = product.originalPrice > total;
   const shouldShowPromotionalPrice = effectivePrice !== total;
   const shouldShowSavings = product.originalPrice > total;
@@ -137,12 +140,12 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
 
   // Helper para label de parcelas do cartão (mais amigável)
   const getInstallmentLabel = () => {
-    if (formData.installments === 1) {
+    if (installments === 1) {
       return `1x no cartão: ${fmt(total)} (inclui ${fmt(feeAmount)} de taxa)`;
     }
 
     const monthlyValue = pricing.monthlyValue.toNumber();
-    return `${formData.installments}x no cartão: ${fmt(monthlyValue)} por mês`;
+    return `${installments}x no cartão: ${fmt(monthlyValue)} por mês`;
   };
 
   // Helper para linha de benefício do PIX (microcopy curta)
@@ -152,8 +155,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
     let text = `Economia: ${fmt(originalSavings)} (${economyPercent}%)`;
 
     if (diffPixVsCard > 0) {
-      const labelCard =
-        formData.installments === 1 ? "1x" : `${formData.installments}x`;
+      const labelCard = installments === 1 ? "1x" : `${installments}x`;
       text += ` • vs cartão ${labelCard}: -${fmt(diffPixVsCard)}`;
     }
 
@@ -367,7 +369,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                       <>
                         <CreditCard className="h-3 w-3 text-text-primary" />
                         <span className="text-text-primary font-medium">
-                          Cartão ({formData.installments}x)
+                          Cartão ({installments}x)
                         </span>
                       </>
                     )}

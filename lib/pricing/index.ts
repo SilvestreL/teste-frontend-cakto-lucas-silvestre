@@ -8,6 +8,7 @@ export {
   validateInstallment,
   PRICING_RULES,
   type PaymentMethod,
+  type InstallmentOption,
   type PricingRule,
   type PricingConfig,
 } from "./pricingRules";

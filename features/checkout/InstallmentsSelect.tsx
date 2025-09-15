@@ -8,18 +8,18 @@ import {
 } from "@/components/ui/select";
 import { getPricing } from "@/lib/pricing";
 import Decimal from "decimal.js";
-
+import { useCheckoutStore } from "@/lib/state/checkoutStore";
 interface InstallmentsSelectProps {
-  value: number;
-  onChange: (installments: number) => void;
   productValue: number;
+  onChange?: (installments: number) => void;
 }
 
 export function InstallmentsSelect({
-  value,
-  onChange,
   productValue,
+  onChange,
 }: InstallmentsSelectProps) {
+  // Usar selectors específicos para evitar re-renders desnecessários
+  const installments = useCheckoutStore((state) => state.installments);
   // Usa o novo sistema de preços para obter opções precisas
   const pricing = getPricing({
     originalValue: new Decimal(productValue),
@@ -33,8 +33,8 @@ export function InstallmentsSelect({
 
   return (
     <Select
-      value={value.toString()}
-      onValueChange={(val) => onChange(Number.parseInt(val))}
+      value={installments.toString()}
+      onValueChange={(val) => onChange?.(Number.parseInt(val))}
     >
       <SelectTrigger className="bg-surface-2 border-border text-text-primary">
         <SelectValue placeholder="Selecione o parcelamento" />
