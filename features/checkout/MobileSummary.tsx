@@ -112,16 +112,18 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
     (originalSavings / product.originalPrice) * 100
   );
 
-  // Helper para label de parcelas do cartão
+  // Helper para label de parcelas do cartão (mais amigável)
   const getInstallmentLabel = () => {
     if (formData.installments === 1) {
-      return `Cartão 1x — total ${fmt(total)} (+${fmt(feeAmount)} de taxa)`;
+      return `💳 1x no cartão: ${fmt(total)} (inclui ${fmt(
+        feeAmount
+      )} de taxa)`;
     }
 
     const monthlyValue = pricing.monthlyValue.toNumber();
-    return `${formData.installments}× de ${fmt(monthlyValue)} — total ${fmt(
-      total
-    )}`;
+    return `💳 ${formData.installments}x no cartão: ${fmt(
+      monthlyValue
+    )} por mês — total ${fmt(total)}`;
   };
 
   // Helper para linha de benefício do PIX (microcopy curta)
@@ -170,18 +172,26 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                     <h3 className="min-w-0 flex-1 text-base md:text-lg font-semibold text-text-primary">
                       {product.name}
                     </h3>
-                    <button
-                      className="shrink-0 flex items-center gap-1 text-xs text-text-secondary"
+                    <div
+                      className="shrink-0 flex items-center gap-1 text-xs text-text-secondary cursor-pointer"
+                      role="button"
+                      tabIndex={0}
                       aria-expanded={isOpen}
                       aria-controls="mobile-summary-details"
                       aria-label={isOpen ? "Ocultar detalhes" : "Ver detalhes"}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setIsOpen(!isOpen);
+                        }
+                      }}
                     >
                       {isOpen ? (
                         <ChevronUp className="h-4 w-4" />
                       ) : (
                         <ChevronDown className="h-4 w-4" />
                       )}
-                    </button>
+                    </div>
                   </div>
 
                   {/* 2) Preço - destaque maior */}
@@ -197,25 +207,30 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                     </div>
                   </div>
 
-                  {/* 3) Chip PIX apenas */}
+                  {/* 3) Chip PIX com reforço */}
                   {isPix && (
-                    <div className="flex flex-wrap items-center justify-center gap-2 min-w-0 py-1">
-                      <span className="md:hidden">
-                        <Badge className="bg-brand/10 text-brand border-brand/20 text-[11px] px-3 py-1.5">
-                          PIX • 0% taxa
-                        </Badge>
-                      </span>
-                      <span className="hidden md:inline">
-                        <Badge className="bg-brand/10 text-brand border-brand/20 text-[11px] px-3 py-1.5">
-                          PIX • 0% taxa • Acesso imediato
-                        </Badge>
-                      </span>
+                    <div className="flex flex-col items-center gap-2 mt-2">
+                      <div className="flex flex-wrap items-center justify-center gap-2 min-w-0">
+                        <span className="md:hidden">
+                          <Badge className="bg-brand/10 text-brand border-brand/20 text-[11px] px-3 py-1.5">
+                            PIX • 0% taxa
+                          </Badge>
+                        </span>
+                        <span className="hidden md:inline">
+                          <Badge className="bg-brand/10 text-brand border-brand/20 text-[11px] px-3 py-1.5">
+                            PIX • 0% taxa • Acesso imediato
+                          </Badge>
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-success font-medium text-center">
+                        Melhor preço garantido com PIX
+                      </div>
                     </div>
                   )}
 
                   {/* 4) Descritivo de parcelas para Cartão */}
                   {!isPix && (
-                    <div className="text-center py-1">
+                    <div className="text-center py-1 mt-2">
                       <p className="text-xs text-text-primary font-medium leading-tight line-clamp-1 break-words min-w-0">
                         {getInstallmentLabel()}
                       </p>
@@ -311,7 +326,9 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
 
                     {/* Valor líquido */}
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-secondary">Valor líquido</span>
+                      <span className="text-text-secondary">
+                        Líquido para o produtor
+                      </span>
                       <span className="text-text-primary font-medium">
                         {formatBRL(netValue)}
                       </span>
