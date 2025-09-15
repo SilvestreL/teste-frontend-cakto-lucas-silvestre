@@ -115,15 +115,11 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
   // Helper para label de parcelas do cartão (mais amigável)
   const getInstallmentLabel = () => {
     if (formData.installments === 1) {
-      return `💳 1x no cartão: ${fmt(total)} (inclui ${fmt(
-        feeAmount
-      )} de taxa)`;
+      return `1x no cartão: ${fmt(total)} (inclui ${fmt(feeAmount)} de taxa)`;
     }
 
     const monthlyValue = pricing.monthlyValue.toNumber();
-    return `💳 ${formData.installments}x no cartão: ${fmt(
-      monthlyValue
-    )} por mês — total ${fmt(total)}`;
+    return `${formData.installments}x no cartão: ${fmt(monthlyValue)} por mês`;
   };
 
   // Helper para linha de benefício do PIX (microcopy curta)
@@ -194,20 +190,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                     </div>
                   </div>
 
-                  {/* 2) Preço - destaque maior */}
-                  <div className="text-center py-1">
-                    <div
-                      className="text-3xl md:text-4xl font-bold leading-none text-text-primary"
-                      aria-live="polite"
-                    >
-                      {formatBRL(total)}
-                    </div>
-                    <div className="text-xs md:text-sm text-text-secondary mt-1">
-                      Total a pagar
-                    </div>
-                  </div>
-
-                  {/* 3) Chip PIX com reforço */}
+                  {/* 2) Chip PIX com reforço */}
                   {isPix && (
                     <div className="flex flex-col items-center gap-2 mt-2">
                       <div className="flex flex-wrap items-center justify-center gap-2 min-w-0">
@@ -228,7 +211,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                     </div>
                   )}
 
-                  {/* 4) Descritivo de parcelas para Cartão */}
+                  {/* 3) Descritivo de parcelas para Cartão */}
                   {!isPix && (
                     <div className="text-center py-1 mt-2">
                       <p className="text-xs text-text-primary font-medium leading-tight line-clamp-1 break-words min-w-0">
@@ -340,24 +323,26 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Footer do card: Total a pagar (apenas quando detalhes abertos) */}
-        {isOpen && (
-          <div className="mt-2 pt-2 border-t border-border/40">
-            <div className="text-center">
-              <div className="text-xs md:text-sm text-text-secondary mb-1">
-                Total a pagar
-              </div>
-              <div
-                className="text-lg md:text-xl font-bold text-text-primary"
-                aria-live="polite"
-                role="text"
-                aria-label={`Total a pagar: ${formatBRL(total)}`}
-              >
-                {formatBRL(total)}
-              </div>
+        {/* Footer do card: Total a pagar (sempre visível) */}
+        <div
+          className="mt-2 pt-2 border-t border-border/40"
+          data-testid="total-footer"
+        >
+          <div className="text-center">
+            <div className="text-xs md:text-sm text-text-secondary mb-1">
+              Total a pagar
+            </div>
+            <div
+              className="text-lg md:text-xl font-bold text-text-primary"
+              aria-live="polite"
+              role="text"
+              aria-label={`Total a pagar: ${formatBRL(total)}`}
+              data-testid="total-to-pay"
+            >
+              {formatBRL(total)}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
