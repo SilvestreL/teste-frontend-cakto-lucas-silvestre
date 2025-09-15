@@ -24,10 +24,22 @@ export default function CheckoutPage() {
 
   const handleSubmit = useCallback(
     async (data: CheckoutInput) => {
+      if (isSubmitting) return; // Prevent double submission
+
       setIsSubmitting(true);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Minimum delay to show loading (800-1200ms)
+      const minDelay = new Promise((resolve) => setTimeout(resolve, 900));
+
+      // Simulate API call (always successful for frontend testing)
+      const apiCall = new Promise((resolve) => {
+        setTimeout(() => {
+          resolve("success");
+        }, 1500);
+      });
+
+      // Wait for both minimum delay and API call
+      await Promise.all([minDelay, apiCall]);
 
       // Generate mock order ID
       const orderId = generateMockOrderId();
@@ -45,7 +57,7 @@ export default function CheckoutPage() {
       // Redirect to success page with order ID and form data
       router.push(`/success?id=${orderId}&data=${encodedData}`);
     },
-    [router]
+    [router, isSubmitting]
   );
 
   return (

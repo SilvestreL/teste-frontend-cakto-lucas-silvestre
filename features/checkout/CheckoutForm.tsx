@@ -15,6 +15,7 @@ import type { CheckoutInput, Product } from "@/types/checkout";
 import { maskCPF, isValidCPF } from "@/lib/cpf";
 import { useCountdown } from "@/lib/hooks/useCountdown";
 import { Shield, Zap, Loader2 } from "lucide-react";
+import { PaymentLoadingOverlay } from "@/components/ui/payment-loading-overlay";
 
 const checkoutSchema = z.object({
   email: z.string().min(1, "Email é obrigatório").email("Email inválido"),
@@ -107,7 +108,7 @@ export function CheckoutForm({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-busy={isSubmitting}>
       <Card className="p-6 bg-surface border-border">
         <div className="space-y-6">
           <div>
@@ -235,6 +236,16 @@ export function CheckoutForm({
           )}
         </div>
       </div>
+
+      {/* Payment Loading Overlay */}
+      <PaymentLoadingOverlay
+        open={isSubmitting}
+        message={
+          paymentMethod === "pix"
+            ? "Gerando e confirmando pagamento PIX…"
+            : "Processando pagamento no cartão…"
+        }
+      />
     </div>
   );
 }
