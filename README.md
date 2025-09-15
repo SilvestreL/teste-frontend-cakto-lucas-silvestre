@@ -2,7 +2,7 @@
 
 ## Decisões Técnicas
 
-Optei por uma arquitetura baseada em Next.js 14 com App Router para aproveitar as funcionalidades modernas de React Server Components e streaming. A escolha do TypeScript garante type safety e melhor experiência de desenvolvimento, enquanto o Tailwind CSS oferece estilização eficiente e responsiva. Implementei uma estrutura modular com separação clara entre componentes de UI reutilizáveis (`components/ui/`) e features específicas (`features/checkout/`), facilitando manutenção e escalabilidade.
+Optei por uma arquitetura baseada em Next.js 14 com App Router para aproveitar as funcionalidades modernas de React Server Components e streaming. Implementei uma estrutura modular com separação clara entre componentes de UI reutilizáveis (`components/ui/`) e features específicas (`features/checkout/`), facilitando manutenção e escalabilidade.
 
 Para o gerenciamento de estado, utilizei Zustand por sua simplicidade e performance superior ao Redux para este caso de uso. A validação de formulários foi implementada com React Hook Form + Zod, proporcionando validação robusta tanto no cliente quanto no servidor. O sistema de pricing foi desenvolvido com uma arquitetura flexível que permite fácil adição de novas regras de cálculo e métodos de pagamento, seguindo princípios SOLID e design patterns como Strategy.
 
@@ -57,6 +57,7 @@ Para aumentar a conversão, implementaria as seguintes otimizações:
 **2. Social Proof Avançado:** Criaria uma seção com depoimentos de clientes reais, logos de empresas que usam o produto, contadores de alunos formados e avaliações com estrelas. Adicionaria também uma seção de "Últimas compras" mostrando transações recentes (com dados anonimizados).
 
 **3. Garantias e Redução de Risco:** Implementaria badges de "Garantia de 30 dias", "Suporte 24/7", "Certificado de conclusão" e "Acesso vitalício". Adicionaria também uma seção de FAQ destacando objeções comuns e suas respostas.
+outr
 
 ---
 

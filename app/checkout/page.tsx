@@ -2,9 +2,7 @@ import { Container } from "@/components/layout/Container";
 import { CactusIcon } from "@/components/ui/cactus-icon";
 import { getProductWithPricing } from "@/lib/server/data";
 import { MobileSummary } from "@/features/checkout/MobileSummary";
-import ProductHero from "@/features/product/ProductHero";
-import ServerSummary from "@/features/summary/ServerSummary";
-import InteractiveSummary from "@/features/summary/InteractiveSummary";
+import { Summary } from "@/features/checkout/Summary";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
@@ -126,10 +124,8 @@ export default async function CheckoutPage() {
           </div>
 
           <div className="hidden lg:block lg:col-span-2">
-            <div className="sticky top-24 space-y-6">
-              <ProductHero product={product} />
-              <ServerSummary product={product} initialPricing={pricing} />
-              <InteractiveSummary product={product} />
+            <div className="sticky top-24">
+              <Summary product={product} />
             </div>
           </div>
         </div>

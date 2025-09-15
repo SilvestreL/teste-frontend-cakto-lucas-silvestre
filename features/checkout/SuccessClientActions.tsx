@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Copy, Download, ArrowRight } from "lucide-react";
 import { PaymentLoadingOverlay } from "@/components/ui/payment-loading-overlay";
@@ -16,6 +17,7 @@ export default function SuccessClientActions({
   orderId,
   isConfirmed,
 }: SuccessClientActionsProps) {
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -31,7 +33,7 @@ export default function SuccessClientActions({
     setIsNavigating(true);
     // Simular delay de navegação
     setTimeout(() => {
-      window.location.href = "/";
+      router.push("/checkout");
     }, 1500);
   };
 

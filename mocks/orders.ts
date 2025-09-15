@@ -56,7 +56,7 @@ export function saveOrder(orderId: string, formData: CheckoutInput) {
     id: orderId,
     formData,
     createdAt: new Date(),
-    status: "confirmed",
+    status: formData.paymentMethod === "pix" ? "confirmed" : "processing",
   });
 }
 

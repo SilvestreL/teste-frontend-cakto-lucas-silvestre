@@ -21,7 +21,9 @@ import { maskCPF } from "@/lib/cpf";
 import { getPricing } from "@/lib/pricing";
 import Decimal from "decimal.js";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PaymentLoadingOverlay } from "@/components/ui/payment-loading-overlay";
+import { getOrderById } from "@/mocks/orders";
 
 interface SuccessStateProps {
   orderId: string;
@@ -33,18 +35,41 @@ interface SuccessStateProps {
   } | null;
 }
 
-// Mock order data based on the order ID and form data
-function getMockOrderData(
-  orderId: string,
-  formData?: SuccessStateProps["formData"]
-) {
-  // Extract timestamp from order ID to simulate realistic data
-  const timestamp = orderId.split("-")[1];
-  const isRecent = Date.now() - Number.parseInt(timestamp) < 300000; // 5 minutes
+// Get real order data based on the order ID
+function getRealOrderData(orderId: string) {
+  // Buscar dados reais do pedido no mock database
+  const savedOrder = getOrderById(orderId);
 
-  // Use form data if available, otherwise simulate
-  const isPix = formData?.paymentMethod === "pix";
-  const installments = formData?.installments || 1;
+  if (!savedOrder) {
+    // Se não encontrar o pedido, usar dados padrão
+    return {
+      id: orderId,
+      status: "processing" as const,
+      paymentMethod: "card" as const,
+      product: {
+        name: "Curso de Marketing Digital 2025",
+        price: 297,
+        originalPrice: 497,
+        producer: "João Silva",
+        format: "digital",
+        deliveryTime: "imediato",
+      },
+      customer: {
+        email: "cliente@exemplo.com",
+        cpf: "***.***.***-**",
+      },
+      payment: {
+        installments: 1,
+        monthlyValue: 297,
+        rate: 0,
+        total: 297,
+      },
+      createdAt: new Date(),
+      pixCode: null,
+    };
+  }
+
+  const { formData } = savedOrder;
 
   // Calculate pricing based on form data - use the same pricing logic as the checkout
   const basePrice = 297; // Promotional price
@@ -54,8 +79,8 @@ function getMockOrderData(
   const pricing = getPricing({
     originalValue: new Decimal(originalPrice),
     currentValue: new Decimal(basePrice),
-    paymentMethod: formData?.paymentMethod || (isPix ? "pix" : "card"),
-    installments: installments,
+    paymentMethod: formData.paymentMethod,
+    installments: formData.installments,
   });
 
   const totalPrice = pricing.total.toNumber();
@@ -63,8 +88,8 @@ function getMockOrderData(
 
   return {
     id: orderId,
-    status: isPix ? "confirmed" : "processing",
-    paymentMethod: formData?.paymentMethod || (isPix ? "pix" : "card"),
+    status: savedOrder.status,
+    paymentMethod: formData.paymentMethod,
     product: {
       name: "Curso de Marketing Digital 2025",
       price: totalPrice,
@@ -74,24 +99,26 @@ function getMockOrderData(
       deliveryTime: "imediato",
     },
     customer: {
-      email: formData?.email || "cliente@exemplo.com",
-      cpf: formData?.cpf ? maskCPF(formData.cpf) : "***.***.***-**",
+      email: formData.email,
+      cpf: maskCPF(formData.cpf),
     },
     payment: {
-      installments: installments,
+      installments: formData.installments,
       monthlyValue: monthlyValue,
-      rate: isPix ? 0 : pricing.rate.toNumber(),
+      rate: formData.paymentMethod === "pix" ? 0 : pricing.rate.toNumber(),
       total: totalPrice,
     },
-    createdAt: new Date(Number.parseInt(timestamp)),
-    pixCode: isPix
-      ? "00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-426614174000520400005303986540529705802BR5925CAKTO PAGAMENTOS LTDA6009SAO PAULO62070503***6304"
-      : null,
+    createdAt: savedOrder.createdAt,
+    pixCode:
+      formData.paymentMethod === "pix"
+        ? "00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-426614174000520400005303986540529705802BR5925CAKTO PAGAMENTOS LTDA6009SAO PAULO62070503***6304"
+        : null,
   };
 }
 
 export function SuccessState({ orderId, formData }: SuccessStateProps) {
-  const [orderData] = useState(() => getMockOrderData(orderId, formData));
+  const router = useRouter();
+  const [orderData] = useState(() => getRealOrderData(orderId));
   const [copied, setCopied] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -107,7 +134,7 @@ export function SuccessState({ orderId, formData }: SuccessStateProps) {
     setIsNavigating(true);
     // Simular delay de navegação
     setTimeout(() => {
-      window.location.href = "/";
+      router.push("/checkout");
     }, 1500);
   };
 
