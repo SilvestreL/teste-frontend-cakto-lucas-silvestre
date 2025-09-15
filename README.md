@@ -10,25 +10,25 @@ A containerização com Docker foi implementada para facilitar a execução do p
 
 ## Como Executar
 
-### Opção 1: Docker (Recomendado)
+### Opção 1: Local (Recomendado)
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/seu-usuario/teste-frontend-cakto-Lucas-Silvestre.git
-cd teste-frontend-cakto-Lucas-Silvestre
+git clone https://github.com/SilvestreL/checkoutpage-next.git
+cd checkoutpage-next
 
-# Executar com Docker
-./docker-scripts.sh start
-```
-
-### Opção 2: Local
-
-```bash
 # Instalar dependências
 pnpm install
 
 # Executar em desenvolvimento
 pnpm dev
+```
+
+### Opção 2: Docker
+
+```bash
+# Executar com Docker
+./docker-scripts.sh start
 ```
 
 A aplicação estará disponível em: `http://localhost:3000`
@@ -57,10 +57,6 @@ Para aumentar a conversão, implementaria as seguintes otimizações:
 **2. Social Proof Avançado:** Criaria uma seção com depoimentos de clientes reais, logos de empresas que usam o produto, contadores de alunos formados e avaliações com estrelas. Adicionaria também uma seção de "Últimas compras" mostrando transações recentes (com dados anonimizados).
 
 **3. Garantias e Redução de Risco:** Implementaria badges de "Garantia de 30 dias", "Suporte 24/7", "Certificado de conclusão" e "Acesso vitalício". Adicionaria também uma seção de FAQ destacando objeções comuns e suas respostas.
-
-**4. Otimização de UX:** Criaria um processo de checkout em etapas (steps) com progress bar, salvamento automático do progresso, opções de pagamento mais visíveis (especialmente PIX com QR Code), e um resumo mais detalhado com benefícios do produto.
-
-**5. Personalização e Segmentação:** Implementaria diferentes versões do checkout baseadas no perfil do usuário, ofertas personalizadas baseadas em comportamento, e testes A/B para diferentes layouts e copywriting.
 
 ---
 
