@@ -282,42 +282,64 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                   </div>
                 </div>
 
-                {/* Resumo financeiro - apenas para Cartão e se houver conteúdo relevante */}
-                {!isPix && shouldShowFinancialSummary && (
-                  <div className="space-y-2 pt-2 border-t border-border/40">
-                    <div className="text-xs md:text-sm text-text-secondary font-medium">
-                      Resumo financeiro
-                    </div>
-
-                    {/* Valor bruto */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-secondary">Valor bruto</span>
-                      <span className="text-text-primary">
-                        {formatBRL(effectivePrice)}
-                      </span>
-                    </div>
-
-                    {/* Taxa da plataforma */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-secondary">
-                        Taxa da plataforma
-                      </span>
-                      <span className="text-text-primary">
-                        +{formatBRL(feeAmount)}
-                      </span>
-                    </div>
-
-                    {/* Valor líquido */}
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-secondary">
-                        Líquido para o produtor
-                      </span>
-                      <span className="text-text-primary font-medium">
-                        {formatBRL(netValue)}
-                      </span>
-                    </div>
+                {/* Resumo financeiro */}
+                <div className="space-y-2 pt-2 border-t border-border/40">
+                  <div className="text-xs md:text-sm text-text-secondary font-medium">
+                    Resumo financeiro
                   </div>
-                )}
+
+                  {/* Valor bruto (mesmo para PIX e Cartão) */}
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-secondary">Valor bruto</span>
+                    <span className="text-text-primary">
+                      {formatBRL(effectivePrice)}
+                    </span>
+                  </div>
+
+                  {isPix ? (
+                    <>
+                      {/* PIX: taxa grátis */}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-text-secondary">
+                          Taxa da plataforma
+                        </span>
+                        <span className="text-success font-medium">
+                          grátis (0%)
+                        </span>
+                      </div>
+
+                      {/* PIX: líquido = bruto (valor cheio) */}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-text-secondary">
+                          Líquido para o produtor
+                        </span>
+                        <span className="text-text-primary font-medium">
+                          100%
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Cartão: taxa e líquido como já era */}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-text-secondary">
+                          Taxa da plataforma
+                        </span>
+                        <span className="text-text-primary">
+                          +{formatBRL(feeAmount)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-text-secondary">
+                          Líquido para o produtor
+                        </span>
+                        <span className="text-text-primary font-medium">
+                          {formatBRL(netValue)}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </Card>
           </CollapsibleContent>
