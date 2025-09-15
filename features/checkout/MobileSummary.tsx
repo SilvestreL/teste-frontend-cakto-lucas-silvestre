@@ -163,28 +163,28 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
 
   return (
     <div className="border-b border-border bg-surface/50 backdrop-blur sticky top-0 z-40 max-w-full">
-      <div className="px-3 py-2 md:px-4 md:py-3 max-w-full">
+      <div className="px-4 py-3 md:px-4 md:py-4 max-w-full">
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full flex items-start p-0 h-auto hover:bg-transparent min-h-[40px] space-x-3"
+              className="w-full flex items-start p-0 h-auto hover:bg-transparent min-h-[60px] space-x-4"
               aria-expanded={isOpen}
               aria-controls="mobile-summary-details"
             >
               {/* Thumbnail do produto */}
-              <div className="w-12 h-12 rounded-lg bg-surface-2 overflow-hidden border border-border flex-shrink-0">
+              <div className="w-16 h-16 rounded-xl bg-surface-2 overflow-hidden border border-border flex-shrink-0 shadow-sm">
                 <Image
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
-                  width={48}
-                  height={48}
+                  width={64}
+                  height={64}
                   className="w-full h-full object-cover"
                 />
               </div>
 
               {/* Conteúdo principal */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 flex flex-col justify-center">
                 {/* HEADER */}
                 <div className="flex flex-col gap-3">
                   {/* 1) Título + Botão */}
