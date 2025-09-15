@@ -28,14 +28,14 @@ describe("Pricing Rules", () => {
     });
 
     it("should calculate correct rate for card multiple installments", () => {
-      // 2x: 3.99% + 2% * (2-1) = 5.99%
-      expect(calculateRate("card", 2)).toEqual(new Decimal("0.0599"));
+      // 2x: 4.99% + 2% * (2-1) = 6.99%
+      expect(calculateRate("card", 2)).toEqual(new Decimal("0.0699"));
       
-      // 3x: 3.99% + 2% * (3-1) = 7.99%
-      expect(calculateRate("card", 3)).toEqual(new Decimal("0.0799"));
+      // 3x: 4.99% + 2% * (3-1) = 8.99%
+      expect(calculateRate("card", 3)).toEqual(new Decimal("0.0899"));
       
-      // 11x: 3.99% + 2% * (11-1) = 23.99%
-      expect(calculateRate("card", 11)).toEqual(new Decimal("0.2399"));
+      // 11x: 4.99% + 2% * (11-1) = 24.99%
+      expect(calculateRate("card", 11)).toEqual(new Decimal("0.2499"));
     });
   });
 
@@ -142,9 +142,9 @@ describe("Pricing Rules", () => {
       expect(options[0].rate).toEqual(new Decimal("0.0399"));
       expect(options[0].total.toFixed(2)).toBe("103.99");
       
-      // 2x should have 5.99% rate
-      expect(options[1].rate).toEqual(new Decimal("0.0599"));
-      expect(options[1].total.toFixed(2)).toBe("105.99");
+      // 2x should have 6.99% rate
+      expect(options[1].rate).toEqual(new Decimal("0.0699"));
+      expect(options[1].total.toFixed(2)).toBe("106.99");
     });
   });
 

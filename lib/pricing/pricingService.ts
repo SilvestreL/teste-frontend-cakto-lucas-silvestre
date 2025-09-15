@@ -186,6 +186,13 @@ export class PricingService {
   }
 
   /**
+   * Limpa cache e força recálculo
+   */
+  forceRecalculation(): void {
+    this.clearCache();
+  }
+
+  /**
    * Obtém estatísticas do cache
    */
   getCacheStats(): { size: number; keys: string[] } {
