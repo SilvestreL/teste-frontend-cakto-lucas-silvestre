@@ -515,7 +515,7 @@ export function Summary({ product, formData }: SummaryProps) {
               {formData.paymentMethod === "card" &&
                 formData.installments > 1 && (
                   <div className="text-xs sm:text-sm text-text-secondary">
-                    (ou {formData.installments}x de {formatBRL(monthlyValue)} no
+                    ({formData.installments}x de {formatBRL(monthlyValue)} no
                     cartão)
                   </div>
                 )}
