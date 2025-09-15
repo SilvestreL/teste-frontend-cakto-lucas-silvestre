@@ -137,7 +137,7 @@ export function MobileSummary({ product, formData }: MobileSummaryProps) {
                           Cartão
                         </span>
                         <Badge className="bg-surface-2 text-text-secondary border-border text-[9px] px-1.5 py-0.5">
-                          até 12x
+                          {formData.installments}x
                         </Badge>
                       </>
                     )}
