@@ -333,7 +333,7 @@ export function SuccessState({ orderId, formData }: SuccessStateProps) {
                 <Zap className="h-6 w-6 text-brand" />
                 <div>
                   <h3 className="font-semibold text-brand">
-                    Pagamento instantâneo confirmado!
+                    Pagamento confirmado!
                   </h3>
                   <p className="text-brand/80">
                     Você já tem acesso completo ao produto.

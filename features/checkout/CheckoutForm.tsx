@@ -14,7 +14,8 @@ import { InstallmentsSelect } from "./InstallmentsSelect";
 import type { CheckoutInput, Product } from "@/types/checkout";
 import { maskCPF } from "@/lib/cpf";
 import { useCountdown } from "@/lib/hooks/useCountdown";
-import { Shield, Zap, Loader2 } from "lucide-react";
+import { Shield, Zap } from "lucide-react";
+import { CactusIcon } from "@/components/ui/cactus-icon";
 import { PaymentLoadingOverlay } from "@/components/ui/payment-loading-overlay";
 import {
   useCheckoutStore,
@@ -254,7 +255,7 @@ export function CheckoutForm({
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <CactusIcon className="h-5 w-5 animate-pulse" />
               Processando pagamento...
             </div>
           ) : (
