@@ -392,11 +392,13 @@ export function SuccessState({ orderId, formData }: SuccessStateProps) {
         </div>
       </Container>
 
-      {/* Navigation Loading Overlay */}
-      <PaymentLoadingOverlay
-        open={isNavigating}
-        message="Redirecionando para o início..."
-      />
+      {/* Navigation Loading Overlay - só aparece quando realmente navegando */}
+      {isNavigating && (
+        <PaymentLoadingOverlay
+          open={isNavigating}
+          message="Redirecionando para o início..."
+        />
+      )}
     </div>
   );
 }
