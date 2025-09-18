@@ -137,14 +137,6 @@ lib/                      # Utilitários
 - ✅ Design responsivo
 - ✅ Interface em português
 
-### Dados Mockados
-
-- Produto: "Curso de Marketing Digital 2025" por João Silva (R$ 297,00)
-- Formato: Digital com entrega imediata
-- Taxas: PIX (0%), Cartão (3,99%)
-- Simulação de processamento com delay de 2s
-- Geração de ID de pedido único
-
 ## 🎨 Interface
 
 ### Design System
