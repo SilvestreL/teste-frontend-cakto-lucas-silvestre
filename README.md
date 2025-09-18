@@ -139,13 +139,6 @@ lib/                      # Utilitários
 
 ## 🎨 Interface
 
-### Design System
-
-- **Cores**: Paleta escura com acentos em azul
-- **Tipografia**: Inter (Google Fonts)
-- **Componentes**: Cards, badges, botões com estados
-- **Feedback Visual**: Loading states, validações, confirmações
-
 ### Responsividade
 
 - Layout adaptativo para mobile e desktop
