@@ -166,17 +166,6 @@ lib/                      # Utilitários
 - Resumo do pedido em sidebar (desktop) ou seção separada (mobile)
 - Navegação otimizada para touch
 
-## 📋 Avaliação Técnica
-
-Este projeto demonstra:
-
-1. **Organização de Código**: Estrutura modular e componentização
-2. **TypeScript**: Tipagem forte e interfaces bem definidas
-3. **Validação**: Formulários com validação robusta
-4. **UX/UI**: Interface intuitiva e responsiva
-5. **Performance**: Otimizações de React e Next.js
-6. **Manutenibilidade**: Código limpo e bem documentado
-
 ## 🔧 Scripts Disponíveis
 
 ```bash
