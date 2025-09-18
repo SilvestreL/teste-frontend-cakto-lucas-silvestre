@@ -128,21 +128,10 @@ lib/                      # Utilitários
 ```
 ### Patterns
 
-1. Singleton + Strategy Pattern
-Destaque: Combinação elegante para sistema de pricing
-Impacto: Demonstra conhecimento em patterns fundamentais
-Relevância: Resolve problema real de negócio
-
-3. Server/Client Component Separation
-Destaque: Arquitetura moderna do Next.js 14
-Impacto: Mostra domínio das funcionalidades mais avançadas
-Relevância: Performance e SEO otimizados
-
-4. State Management + Custom Hooks
-Destaque: Performance otimizada com Zustand
-Impacto: Demonstra conhecimento em otimização
-Relevância: Reutilização de lógica e evitar re-renders
-
+1. Singleton Pattern + Strategy Pattern - Sistema de Pricing
+2. Server/Client Component Separation - Arquitetura Next.js
+3. State Management Pattern (Zustand) + Custom Hooks - Performance Otimizada
+   
 ### Funcionalidades Implementadas
 
 - ✅ Validação de CPF em tempo real
