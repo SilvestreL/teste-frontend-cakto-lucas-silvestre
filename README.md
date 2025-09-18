@@ -63,18 +63,12 @@ outr
 
 ## 🐳 Containerização
 
-Este projeto inclui configuração simples de Docker para facilitar a execução:
+Este projeto utiliza Docker para garantir consistência, isolamento e facilidade na execução em diferentes ambientes.
 
-- **Dockerfile.dev**: Configuração para desenvolvimento
-- **docker-compose.yml**: Orquestração de serviços
-- **Scripts auxiliares**: `docker-scripts.sh` para facilitar o uso
-
-### Vantagens da Containerização
-
-- ✅ **Instalação zero**: Não precisa instalar Node.js ou pnpm
-- ✅ **Ambiente isolado**: Não interfere com outras aplicações
-- ✅ **Hot reload**: Mudanças no código são refletidas automaticamente
-- ✅ **Comando simples**: Apenas `./docker-scripts.sh start`
+Estrutura
+	•	Dockerfile.dev – Configuração otimizada para ambiente de desenvolvimento.
+	•	docker-compose.yml – Orquestração dos serviços necessários.
+	•	docker-scripts.sh – Script utilitário para padronizar os comandos mais usados.
 
 ## 📱 Fluxo da Aplicação
 
