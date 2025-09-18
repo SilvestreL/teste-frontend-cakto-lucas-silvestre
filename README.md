@@ -126,6 +126,22 @@ lib/                      # Utilitários
 ├── taxes.ts              # Cálculo de taxas
 └── cpf.ts                # Validação de CPF
 ```
+### Patterns
+
+1. Singleton + Strategy Pattern
+Destaque: Combinação elegante para sistema de pricing
+Impacto: Demonstra conhecimento em patterns fundamentais
+Relevância: Resolve problema real de negócio
+
+3. Server/Client Component Separation
+Destaque: Arquitetura moderna do Next.js 14
+Impacto: Mostra domínio das funcionalidades mais avançadas
+Relevância: Performance e SEO otimizados
+
+4. State Management + Custom Hooks
+Destaque: Performance otimizada com Zustand
+Impacto: Demonstra conhecimento em otimização
+Relevância: Reutilização de lógica e evitar re-renders
 
 ### Funcionalidades Implementadas
 
